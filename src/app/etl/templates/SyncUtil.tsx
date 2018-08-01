@@ -45,7 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file import-spacing
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import
 {
@@ -53,13 +56,16 @@ import
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import * as Utils from 'shared/transformations/util/EngineUtils';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 const hiddenPath = List(['uiState', 'hidden']);
 export function createFieldMap(engine: TransformationEngine): FieldMap
 {
-  const treeMap = EngineUtil.createTreeFromEngine(engine)
+  const treeMap = engine.createTree()
     .map((children, id) => createFieldFromEngine(engine, id).set('childrenIds', children))
     .toMap();
   return treeMap;
@@ -71,7 +77,7 @@ export function createFieldFromEngine(
   id: number,
 ): TemplateField
 {
-  const enginePath = engine.getOutputKeyPath(id);
+  const enginePath = engine.getFieldPath(id);
   const transformationIds = engine.getTransformations(id);
 
   const transformations: List<TransformationNode> = transformationIds.map((transformationId, index) =>
@@ -90,9 +96,8 @@ export function createFieldFromEngine(
     isHidden: engine.getFieldProp(id, hiddenPath) === true,
     fieldId: id,
     fieldProps: engine.getFieldProps(id),
-    inputKeyPath: engine.getInputKeyPath(id),
-    outputKeyPath: engine.getOutputKeyPath(id),
-    etlType: EngineUtil.getETLFieldType(id, engine),
+    fieldPath: engine.getFieldPath(id),
+    etlType: Utils.fields.fieldType(id, engine),
     transformations,
     name: enginePath.last().toString(),
   });

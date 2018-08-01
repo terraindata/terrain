@@ -274,6 +274,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       {
         const engine = state.getCurrentEngine();
         const newFieldMap = createFieldMap(engine);
+
         return state.set('fieldMap', newFieldMap);
       },
       rebuildField: (state, action) =>

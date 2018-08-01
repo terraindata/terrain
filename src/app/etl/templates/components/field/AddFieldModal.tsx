@@ -45,23 +45,29 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Modal from 'common/components/Modal';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames } from 'shared/etl/types/ETLTypes';
-import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
+import { etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+const { List, Map } = Immutable;
 
 import './EditorFieldModal.less';
 
@@ -96,39 +102,39 @@ export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 interface FormState
 {
   name: string;
-  type: ETLFieldTypes;
+  type: FieldTypes;
 }
 
 const addFieldMap: InputDeclarationMap<FormState> =
-{
-  name: {
-    type: DisplayType.TextBox,
-    displayName: 'Name',
-    group: 'file type',
-  },
-  type: {
-    type: DisplayType.Pick,
-    displayName: 'Field Type',
-    options: {
-      pickOptions: (s) => etlFieldTypesList,
-      indexResolver: (value) => etlFieldTypesList.indexOf(value),
-      displayNames: (s) => etlFieldTypesNames,
+  {
+    name: {
+      type: DisplayType.TextBox,
+      displayName: 'Name',
+      group: 'file type',
     },
-  },
-};
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Field Type',
+      options: {
+        pickOptions: (s) => etlFieldTypesList,
+        indexResolver: (value) => etlFieldTypesList.indexOf(value),
+        displayNames: (s) => etlFieldTypesNames,
+      },
+    },
+  };
 
 // UI to add a new field underneath this field
 class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: FormState = {
     name: 'new_field',
-    type: ETLFieldTypes.String,
+    type: FieldTypes.String,
   };
 
   @instanceFnDecorator(memoizeOne)
   public _validateKeyPath(engine, engineVersion, field, pathKP: KeyPath)
   {
-    return validateNewFieldName(engine, field.fieldId, pathKP);
+    return Utils.validation.canAddField(engine, field.fieldId, pathKP);
   }
 
   public validateKeyPath(): { isValid: boolean, message: string }
@@ -148,7 +154,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   public computeKeyPath(): EnginePath
   {
     const field = this._field();
-    return this._computeKeyPath(field.outputKeyPath, this.state.name);
+    return this._computeKeyPath(field.fieldPath, this.state.name);
   }
 
   public renderInner()
@@ -227,14 +233,14 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
 {
   public state: FormState = {
     name: 'new_field',
-    type: ETLFieldTypes.String,
+    type: FieldTypes.String,
   };
 
   @instanceFnDecorator(memoizeOne)
   public _validateKeyPath(engine, engineVersion, name: string)
   {
     const pathKP = List([name]);
-    return validateNewFieldName(engine, -1, pathKP);
+    return Utils.validation.canAddField(engine, -1, pathKP);
   }
 
   public validateKeyPath(): { isValid: boolean, message: string }

@@ -1,0 +1,1488 @@
+{
+  "testName": "MC_09",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "SKU": "KTCR-0054-GRW",
+      "VariantName": "Personalized Growler Crate",
+      "Price": 79.99,
+      "Inventory": 646,
+      "VariantStatus": "sellable",
+      "ProductId": 98,
+      "VariantId": 190,
+      "Path": "personalized-growler-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-growler-crate",
+      "ContentsHTML": "<h4>Exploration Equipment</h4> <ul>\r\n  <li>Personalized Mini-Keg Growler, 64 oz</li>\r\n  <li>White Chalk Pencil</li>\r\n  <li>(2) Classic Pint Glasses</li>\r\n</ul> <h4>Drinking Buddies</h4> <ul>\r\n  <li>33 Bottles Of Beer Tasting Journal</li>\r\n  <li>Brew Candy</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Straight From The Source Some quests are more honorable than others, and with all due respect to men collecting\r\n   stamps and state quarters, we're focusing on a far loftier goal: the quest to enjoy\r\n   every microbrew in America straight from the source.\r\n This journey, while extremely delicious, is also extremely difficult. A devout band of drinking buddies\r\n   must canoe for miles, caravan for weeks, and forsake all adult responsibilities\r\n   to achieve the fullness of flavor.\r\n These brave souls are our modern-day keg-quistadors in search of the mythical Fountain of Booze. Jug Life A knight would never ride into battle without his trusty steed, sharpened steel, and self-righteous\r\n   sense of divine approval, and neither should you embark upon the quest for quenched\r\n   thirst without a personalized steel growler.\r\n The road between breweries is long and dry, and only 64 oz. of cool, carbonated brew will carry your\r\n   spirits onward. Top it off at each stop, chalk details directly onto the mini-keg with the white\r\n   chalk pencil, and share generously with fellow pilgrims along the way in a pair\r\n   of classic screenprinted pint glasses.\r\n Always remember, your quest is valiant, and the growler is laser-etched with your name, so carry it with\r\n   pride throughout the land.\r\n Drink Beers For \"Research\" Your thoroughly documented taste will live forever in the annals of time in the 33 Bottles of Beer Book.\r\n   Log textures and flavors as you sip, and present the book upon entrance to any brewery to ensure they bring\r\n   out the good stuff.\r\n Get ye quest for eternal refreshment underway with the Personalized Growler Crate.",
+      "Contents": "Exploration Equipment \r\n  Personalized Mini-Keg Growler, 64 oz\r\n  White Chalk Pencil\r\n  (2) Classic Pint Glasses\r\n Drinking Buddies \r\n  33 Bottles Of Beer Tasting Journal\r\n  Brew Candy\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Straight From The Source</h4> <p>Some quests are more honorable than others, and with all due respect to men collecting\r\n   stamps and state quarters, we're focusing on a far loftier goal: the quest to enjoy\r\n   every microbrew in America straight from the source.\r\n</p> <p>This journey, while extremely delicious, is also extremely difficult. A devout band of drinking buddies\r\n   must canoe for miles, caravan for weeks, and forsake all adult responsibilities\r\n   to achieve the fullness of flavor.\r\n</p> <p>These brave souls are our modern-day keg-quistadors in search of the mythical Fountain of Booze.</p> <h4>Jug Life</h4> <p>A knight would never ride into battle without his trusty steed, sharpened steel, and self-righteous\r\n   sense of divine approval, and neither should you embark upon the quest for quenched\r\n   thirst without a personalized steel growler.\r\n</p> <p>The road between breweries is long and dry, and only 64 oz. of cool, carbonated brew will carry your\r\n   spirits onward. Top it off at each stop, chalk details directly onto the mini-keg with the white\r\n   chalk pencil, and share generously with fellow pilgrims along the way in a pair\r\n   of classic screenprinted pint glasses.\r\n</p> <p>Always remember, your quest is valiant, and the growler is laser-etched with your name, so carry it with\r\n   pride throughout the land.\r\n</p> <h4>Drink Beers For \"Research\"</h4> <p>Your thoroughly documented taste will live forever in the annals of time in the 33 Bottles of Beer Book.\r\n   Log textures and flavors as you sip, and present the book upon entrance to any brewery to ensure they bring\r\n   out the good stuff.\r\n</p> <p>Get ye quest for eternal refreshment underway with the Personalized Growler Crate.</p>",
+      "Name": "Personalized Growler Crate",
+      "ConversionRate": 4.602803738317757,
+      "UniquePurchases": 197,
+      "ProductRevenue": 15758.03,
+      "Quantity": 197,
+      "AveragePrice": 79.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/748/large/pgc_personalized_growler_gifts_for_craft_beer_guys__01242.jpg?1502411176",
+      "Margin": 58.88,
+      "TerrainScore": 0.5171456786732374,
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0007-BAR",
+      "VariantName": "Personalized Barware",
+      "Price": 99.99,
+      "Inventory": 510,
+      "VariantStatus": "sellable",
+      "ProductId": 129,
+      "VariantId": 255,
+      "Path": "personalized-barware-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-barware-crate",
+      "ContentsHTML": "<h4>Home Bar Gear</h4> <ul>\r\n  <li>4 Personalized Pint Glasses</li>\r\n  <li>4 Personalized Wooden Coasters/Bottle Openers</li>\r\n</ul> <h4>Counter Chow</h4> <ul>\r\n  <li>Pistachios, 5 oz</li>\r\n  <li>BBQ Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts Bar Mix, 3.25 oz</li>\r\n  <li>CB's Lightly Salted Ballpark Peanuts, 12 oz</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Greatness Has A Name When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments. This Time It's Personal Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n Probably not. He probably drinks from non-personalized glasses like an uncultured chump.  We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n The Man, The Myth, The Legendary Coasters The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n Grab the Personalized Barware Crate today and ensure the world never forgets your name.",
+      "Contents": "Home Bar Gear \r\n  4 Personalized Pint Glasses\r\n  4 Personalized Wooden Coasters/Bottle Openers\r\n Counter Chow \r\n  Pistachios, 5 oz\r\n  BBQ Corn Nuggets, 4 oz\r\n  Beer Nuts Bar Mix, 3.25 oz\r\n  CB's Lightly Salted Ballpark Peanuts, 12 oz\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Greatness Has A Name</h4> <p>When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n</p> <p>A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments.</p> <h4>This Time It's Personal</h4> <p>Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n</p> <p>Probably not. He probably drinks from non-personalized glasses like an uncultured chump. </p> <p>We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n</p> <p>So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n</p> <h4>The Man, The Myth, The Legendary Coasters</h4> <p>The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n</p> <p>And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n</p> <p>Grab the Personalized Barware Crate today and ensure the world never forgets your name.</p>",
+      "Name": "Personalized Barware Crate",
+      "ConversionRate": 5.160026126714565,
+      "UniquePurchases": 158,
+      "ProductRevenue": 15798.42,
+      "Quantity": 158,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/884/large/pb_personalized_pint_giftset_for_beer_loving_guys__44982.jpg?1502411232",
+      "Margin": 77.25,
+      "TerrainScore": 0.5086911750404629,
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTMC-0003-MUG",
+      "VariantName": "Personalized Mug Mini Crate",
+      "Price": 49.99,
+      "Inventory": 377,
+      "VariantStatus": "sellable",
+      "ProductId": 49,
+      "VariantId": 121,
+      "Path": "personalized-mug-mini-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-mug-mini-crate",
+      "ContentsHTML": "<h4>Our Lasers Take Time</h4> \r\n<p>Personalized items require 2 days of processing time.</p>\r\n<br><br>\r\n\r\n\r\n\r\n\r\n<h4>Coffee Crew</h4> <ul>\r\n  <li>Brushed Silver Glacier Camp Mug, 15 oz</li>\r\n  <li>Ultralight Java Drip Coffee Maker</li>\r\n  <li>Warrior Select Coffee Sample Pack, 2 oz</li>\r\n</ul>",
+      "LongDescription": "Life of a Dripster Some people wake up with coffee, and some people wake up for coffee. With the former, coffee acts as a stable morning ritual: a caffeinated breakfast complement, or the\r\n   patient carpool companion on the morning commute. With the latter, coffee is an\r\n   all-encompassing religion: the ground of bean by which all existence and meaning\r\n   flow.\r\n These coffee-devotees are known as \"dripsters,\" and they hold bean quality and brewing methodology to the\r\n   highest possible standard. They refuse to compromise their values, and thus, the Personalized Mug Mini\r\n   Crate is the dripster's dream come true.\r\n Small Batch, Big World No dripster has fully received coffee communion until they've drank from their very own personalized mug.\r\n   This 15 oz. stainless steel mug proudly proclaims caffeine devotion to the world and\r\n   can be laser-etched with the given family name or a newly christened dripster name.\r\n Forever gone are the dark days of pouring commoner's caffeine from the office coffee pot. With the portable\r\n   GSI Java Drip and Alpha coffee grinds, the dripster can now indulge in the perky perks of small-batch, pour\r\n   over coffee anywhere.\r\n The greater telos of coffee has been achieved in the Personalized Mug Mini Crate.",
+      "Contents": "Our Lasers Take Time \r\nPersonalized items require 2 days of processing time.\r\n\r\n\r\n\r\n\r\n\r\nCoffee Crew \r\n  Brushed Silver Glacier Camp Mug, 15 oz\r\n  Ultralight Java Drip Coffee Maker\r\n  Warrior Select Coffee Sample Pack, 2 oz\r\n",
+      "LongDescriptionHTML": "<h4>Life of a Dripster</h4> <p>Some people wake up with coffee, and some people wake up for coffee.</p> <p>With the former, coffee acts as a stable morning ritual: a caffeinated breakfast complement, or the\r\n   patient carpool companion on the morning commute. With the latter, coffee is an\r\n   all-encompassing religion: the ground of bean by which all existence and meaning\r\n   flow.\r\n</p> <p>These coffee-devotees are known as \"dripsters,\" and they hold bean quality and brewing methodology to the\r\n   highest possible standard. They refuse to compromise their values, and thus, the Personalized Mug Mini\r\n   Crate is the dripster's dream come true.\r\n</p> <h4>Small Batch, Big World</h4> <p>No dripster has fully received coffee communion until they've drank from their very own personalized mug.\r\n   This 15 oz. stainless steel mug proudly proclaims caffeine devotion to the world and\r\n   can be laser-etched with the given family name or a newly christened dripster name.\r\n</p> <p>Forever gone are the dark days of pouring commoner's caffeine from the office coffee pot. With the portable\r\n   GSI Java Drip and Alpha coffee grinds, the dripster can now indulge in the perky perks of small-batch, pour\r\n   over coffee anywhere.\r\n</p> <p>The greater telos of coffee has been achieved in the Personalized Mug Mini Crate.</p>",
+      "Name": "Personalized Mug",
+      "ConversionRate": 3.3781928041746774,
+      "UniquePurchases": 123,
+      "ProductRevenue": 6148.77,
+      "Quantity": 123,
+      "AveragePrice": 49.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/535/large/eb_mc_PersonalizedMug_web-8339.jpg?1518734705",
+      "Margin": 62.29,
+      "TerrainScore": 0.49650772320051406,
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "Inventory": 1021,
+      "VariantStatus": "sellable",
+      "ProductId": 137,
+      "VariantId": 263,
+      "Path": "whiskey-appreciation-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "An Executive Appreciation In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n Oh, yes we de-can! Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n Good Company Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n",
+      "Contents": "Distinguished Gear \r\n  Personalized Whiskey Decanter (hand-made, may contain minor imperfections)\r\n  2 Personalized Heavy Bottom Rocks Glasses, 9 oz\r\n  2 Ice Sphere Molds\r\n  2 Slate Coasters\r\n  Whiskey Drinking Journal\r\n Luxury Grub \r\n  Spiced Peppercorn Peanuts\r\n  Salted Pistachios\r\n  Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours to process.",
+      "LongDescriptionHTML": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ConversionRate": 2.988691437802908,
+      "UniquePurchases": 222,
+      "ProductRevenue": 35517.78,
+      "Quantity": 222,
+      "AveragePrice": 159.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "Margin": 70.18,
+      "TerrainScore": 0.4851325548374563,
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "Inventory": 1779,
+      "VariantStatus": "sellable",
+      "ProductId": 20,
+      "VariantId": 20,
+      "Path": "personalized-pint-set-ammo-can",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "ContentsHTML": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The World Is His Man Cave A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n Go Forth And Drink With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n",
+      "Contents": "Beer Buddies \r\n  2 Laser-Etched Pint Glasses\r\n  Personalized .50 Cal Bottle Opener\r\n Beef Sticks \r\n  Peppered Jerky Stick\r\n  Original Jerky Stick\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ConversionRate": 5.595116988809766,
+      "UniquePurchases": 275,
+      "ProductRevenue": 17872.25,
+      "Quantity": 275,
+      "AveragePrice": 64.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "Margin": 75.5,
+      "TerrainScore": 0.48359956704092,
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0009-PWH",
+      "VariantName": "Personalized Whiskey Crate",
+      "Price": 119.99,
+      "Inventory": 532,
+      "VariantStatus": "sellable",
+      "ProductId": 84,
+      "VariantId": 176,
+      "Path": "personalized-whiskey-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-whiskey-crate",
+      "ContentsHTML": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.</li>\r\n  <li>2 Tovolo Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>33 Drams Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Squirrel Brand Spiced Peppercorn Peanuts</li>\r\n  <li>Wonderful Salted Pistachios</li>\r\n  <li>Sahale Snacks Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "The Sophisticated Man Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n Bold Bravado Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n Cultured Accompaniments Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n",
+      "Contents": "Distinguished Gear \r\n  2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.\r\n  2 Tovolo Ice Sphere Molds\r\n  2 Slate Coasters\r\n  33 Drams Whiskey Drinking Journal\r\n Luxury Grub \r\n  Squirrel Brand Spiced Peppercorn Peanuts\r\n  Wonderful Salted Pistachios\r\n  Sahale Snacks Cranberry Pecans\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>The Sophisticated Man</h4> <p>Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n</p> <p>The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n</p> <h4>Bold Bravado</h4> <p>Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n</p> <p>This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n</p> <p>Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n</p> <h4>Cultured Accompaniments</h4> <p>Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n</p> <p>And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n</p> <p>The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n</p>",
+      "Name": "Personalized Whiskey Crate",
+      "ConversionRate": 2.8254847645429364,
+      "UniquePurchases": 51,
+      "ProductRevenue": 6119.49,
+      "Quantity": 51,
+      "AveragePrice": 119.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/689/large/pw_sophisticated_whiskey_gifts_for_claseey_guys__10836.jpg?1502411151",
+      "Margin": 68.7,
+      "TerrainScore": 0.44734669982234737,
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0036-STE",
+      "VariantName": "Personalized Oktoberfest Stein",
+      "Price": 69.99,
+      "Inventory": 355,
+      "VariantStatus": "sellable",
+      "ProductId": 64,
+      "VariantId": 136,
+      "Path": "personalized-oktoberfest-stein",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-oktoberfest-stein",
+      "ContentsHTML": "<h4>Personal Beer Barrel</h4> <ul>\r\n  <li>Personalized Oktoberfest Stein</li>\r\n  <li>(2) Oktoberfest-Themed Coasters/Bottle Openers</li>\r\n</ul> <h4>Deutschland Delicacies</h4> <ul>\r\n  <li>Saverne Artisanal \"Craft Beer\" Kraut</li>\r\n  <li>Bavarian Salami Sausage</li>\r\n  <li>Bavarian Summer Sausage</li>\r\n  <li>Inglehoffer Stone Ground Mustard</li>\r\n  <li>East Shore Pretzel Bites</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "Oktober State of Mind Oktoberfest, the 17-day stein-clanking, pretzel-munching pride and joy of Germany, is actually\r\n   very American when you think about it. Nothing screams \"Freedom!\" louder than gorging\r\n   one's self on another culture's delicacies while drinking liters gallons of beer in a foreign land with friends\r\n   and festive strangers.\r\n In true American fashion, we've decided to do Oktoberfest better than the people who invented it by making\r\n   it last longer--much longer. The Oktoberfest Man Crate is America's greatest innovation: 365 Days of\r\n   Oktoberfest.\r\n Der Biermeister Say what you will about Germans, their outlandish haircuts, and complete inability to comprehend sarcasm\r\n   (and believe us, we do), but those Deutschlanders sure know how to appreciate a good brew. The glass\r\n   stein is reserved for the no-nonsense beer drinker.\r\n Forever unite yourself with the Spirit of Oktober by etching your name into a glass Oktoberfest stein.\r\n   And for the record, just because this mammoth of a mug can hold enough beer for\r\n   two does not mean you're obligated to share. Your name is permanently engraved on\r\n   it for a reason.\r\n The crate also contains two Oktoberfest stein-sized coaster/bottle openers. One to rest underneath your\r\n   personalized stein, and another to get your reload primed for pouring.\r\n Snacktober It's not Oktober unless you're importing Germany's finest traditional foods like Bavarian salami\r\n   and summer sausage, pretzels, and Inglehoffer Stone Ground Mustard straight into your chomper chamber. And\r\n   if you're looking for \"authentisch Sauerkraut\", Saverne's Artisanal \"Craft Beer\" Kraut is as authentically\r\n   German as a jolly mountaineer prancing around in Lederhosen yodeling David Hasselhoff's \"Looking for\r\n   Freedom\".\r\n Keep Oktober as your state of mind all the time with the Oktoberfest Crate.",
+      "Contents": "Personal Beer Barrel \r\n  Personalized Oktoberfest Stein\r\n  (2) Oktoberfest-Themed Coasters/Bottle Openers\r\n Deutschland Delicacies \r\n  Saverne Artisanal \"Craft Beer\" Kraut\r\n  Bavarian Salami Sausage\r\n  Bavarian Summer Sausage\r\n  Inglehoffer Stone Ground Mustard\r\n  East Shore Pretzel Bites\r\n\r\nNOTE: Personalized items require 48 hours of processing time.",
+      "LongDescriptionHTML": "<h4>Oktober State of Mind</h4> <p>Oktoberfest, the 17-day stein-clanking, pretzel-munching pride and joy of Germany, is actually\r\n   very American when you think about it. Nothing screams \"Freedom!\" louder than gorging\r\n   one's self on another culture's delicacies while drinking liters gallons of beer in a foreign land with friends\r\n   and festive strangers.\r\n</p> <p>In true American fashion, we've decided to do Oktoberfest better than the people who invented it by making\r\n   it last longer--much longer. The Oktoberfest Man Crate is America's greatest innovation: 365 Days of\r\n   Oktoberfest.\r\n</p> <h4>Der Biermeister</h4> <p>Say what you will about Germans, their outlandish haircuts, and complete inability to comprehend sarcasm\r\n   (and believe us, we do), but those Deutschlanders sure know how to appreciate a good brew. The glass\r\n   stein is reserved for the no-nonsense beer drinker.\r\n</p> <p>Forever unite yourself with the Spirit of Oktober by etching your name into a glass Oktoberfest stein.\r\n   And for the record, just because this mammoth of a mug can hold enough beer for\r\n   two does not mean you're obligated to share. Your name is permanently engraved on\r\n   it for a reason.\r\n</p> <p>The crate also contains two Oktoberfest stein-sized coaster/bottle openers. One to rest underneath your\r\n   personalized stein, and another to get your reload primed for pouring.\r\n</p> <h4>Snacktober</h4> <p>It's not Oktober unless you're importing Germany's finest traditional foods like Bavarian salami\r\n   and summer sausage, pretzels, and Inglehoffer Stone Ground Mustard straight into your chomper chamber. And\r\n   if you're looking for \"authentisch Sauerkraut\", Saverne's Artisanal \"Craft Beer\" Kraut is as authentically\r\n   German as a jolly mountaineer prancing around in Lederhosen yodeling David Hasselhoff's \"Looking for\r\n   Freedom\".\r\n</p> <p>Keep Oktober as your state of mind all the time with the Oktoberfest Crate.</p>",
+      "Name": "Personalized Oktoberfest Stein Crate",
+      "ConversionRate": 4.29553264604811,
+      "UniquePurchases": 150,
+      "ProductRevenue": 10498.5,
+      "Quantity": 150,
+      "AveragePrice": 69.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/599/large/okt-s-personalized-stein-and-snack-gifts-for-men__91353.jpg?1502411116",
+      "Margin": 57.42,
+      "TerrainScore": 0.4384595454232479,
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTHB-0001-FLV",
+      "VariantName": "Personalized Flask: Vampire Desires",
+      "Price": 39.99,
+      "Inventory": 918,
+      "VariantStatus": "sellable",
+      "ProductId": 117,
+      "VariantId": 239,
+      "Path": "secret-stash-personalized-flask",
+      "CanonicalUrl": "www.mancrates.com/store/products/secret-stash-personalized-flask",
+      "ContentsHTML": "<h4>Our Lasers Take Time</h4> \r\n<p>This Personalized item requires 1 day of processing time.</p>\r\n<br><br>\r\n\r\n\r\n\r\n<h4>Home Security System</h4> <ul>\r\n  <li>Personalized Flask</li>\r\n  <li>Secret Stash Book</li>\r\n  <li>Your Choice of a Custom Dust Jacket</li>\r\n</ul>",
+      "LongDescription": "A Brilliant Ruse Sometime books make great gifts, like the driving manual for a Jaguar F-Type with accompanying\r\n   vehicle. But most of the time, books gifts are boring and should be avoided.\r\n If it's a book you're certain he wants, then maybe. But if it's a book you just\r\n   think he'll like, there are cheaper ways to prop up a table. It's a celebration,\r\n   not a summer reading list.\r\n We've concocted a brilliant ruse that plays on humanity's widespread discomfort with the extremely longform\r\n   written word. The Secret Stash Personalized Flask takes him from dustjacket disappointment to actual lived\r\n   adventures with the simple turn of a page.\r\n An Intoxicating Story We've been told to judge a book not by its cover, but by the contents of its pages. Well,\r\n   these pages conceal a personalized drinking vessel, so it's basically an instant literary classic. Housed\r\n   within the pages itself is a sleek 6 oz. stainless steel flask.\r\n And we've penned our own literary masterpiece by lasering onto the matte black finish. The only thing about\r\n   this gift he'll have to read is his name.\r\n Best of all, the book can be re-used as a \"security-by-obscurity\" safety-deposit book. Too Good To Be True To up the outrage factor before the big reveal, we've created some phoney dust jackets that will raise far\r\n   more questions than answers. Choose which of these three terrible books he'll have to awkwardly pretend to\r\n   enjoy receiving:\r\n \r\n   Vampire Desires, a gripping romance-fantasy adventure of immortal love, loss, and lust;\r\n   Have You Seen My Keys, the latest installment of the unacclaimed and unrequested Sherluck Holmes\r\n       mystery series\r\n  \r\n   How to Hide Your Stuff, a simpleton's conspiracy theory/self-help book from the paranoid mind of one\r\n       Jedd Dangus\r\n  \r\n And if he has concerns about displaying any of these on his bookshelf, we've printed Plan B directly onto\r\n   the spine of the book. He can remove the dust jacket and hide in plain sight the inconspicuous book, Biting\r\n   Your Neighbor's Horse: and other confusing euphemisms.\r\n The Secret Stash Personalized Flask is an unforgettable gift of surprise and safekeeping.",
+      "Contents": "Our Lasers Take Time \r\nThis Personalized item requires 1 day of processing time.\r\n\r\n\r\n\r\n\r\nHome Security System \r\n  Personalized Flask\r\n  Secret Stash Book\r\n  Your Choice of a Custom Dust Jacket\r\n",
+      "LongDescriptionHTML": "<h4>A Brilliant Ruse</h4> <p>Sometime books make great gifts, like the driving manual for a Jaguar F-Type with accompanying\r\n   vehicle. But most of the time, books gifts are boring and should be avoided.\r\n</p> <p>If it's a book you're certain he wants, then maybe. But if it's a book you just\r\n   think he'll like, there are cheaper ways to prop up a table. It's a celebration,\r\n   not a summer reading list.\r\n</p> <p>We've concocted a brilliant ruse that plays on humanity's widespread discomfort with the extremely longform\r\n   written word. The Secret Stash Personalized Flask takes him from dustjacket disappointment to actual lived\r\n   adventures with the simple turn of a page.\r\n</p> <h4>An Intoxicating Story</h4> <p>We've been told to judge a book not by its cover, but by the contents of its pages. Well,\r\n   these pages conceal a personalized drinking vessel, so it's basically an instant literary classic. Housed\r\n   within the pages itself is a sleek 6 oz. stainless steel flask.\r\n</p> <p>And we've penned our own literary masterpiece by lasering onto the matte black finish. The only thing about\r\n   this gift he'll have to read is his name.\r\n</p> <p>Best of all, the book can be re-used as a \"security-by-obscurity\" safety-deposit book.</p> <h4>Too Good To Be True</h4> <p>To up the outrage factor before the big reveal, we've created some phoney dust jackets that will raise far\r\n   more questions than answers. Choose which of these three terrible books he'll have to awkwardly pretend to\r\n   enjoy receiving:\r\n</p> <ul>\r\n  <li> Vampire Desires, a gripping romance-fantasy adventure of immortal love, loss, and lust;</li>\r\n  <li> Have You Seen My Keys, the latest installment of the unacclaimed and unrequested Sherluck Holmes\r\n       mystery series\r\n  </li>\r\n  <li> How to Hide Your Stuff, a simpleton's conspiracy theory/self-help book from the paranoid mind of one\r\n       Jedd Dangus\r\n  </li>\r\n</ul> <p>And if he has concerns about displaying any of these on his bookshelf, we've printed Plan B directly onto\r\n   the spine of the book. He can remove the dust jacket and hide in plain sight the inconspicuous book, Biting\r\n   Your Neighbor's Horse: and other confusing euphemisms.\r\n</p> <p>The Secret Stash Personalized Flask is an unforgettable gift of surprise and safekeeping.</p>",
+      "Name": "Personalized Flask in Book Vampires",
+      "ConversionRate": 3.258145363408521,
+      "UniquePurchases": 39,
+      "ProductRevenue": 1559.61,
+      "Quantity": 39,
+      "AveragePrice": 39.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/833/large/Flask-Inside-book__41814.jpg?1502411212",
+      "Margin": 61.07,
+      "TerrainScore": 0.42391614641042397,
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTBX-0025-GOO",
+      "VariantName": "Golf and Go Caddy Pack",
+      "Price": 99.99,
+      "Inventory": 654,
+      "VariantStatus": "sellable",
+      "ProductId": 238,
+      "VariantId": 434,
+      "ContentsHTML": "<h4>Our Lasers Take Time</h4>\r\n<p>This personalized item requires 1 day of processing time.</p>\r\n\r\n<ul>\r\n  <li>Golf Organizer</li>\r\n    <li>15 Personalized Callaway Warbird Golf Balls</li>\r\n  <li>6 Club Holder</li>\r\n\r\n</ul>",
+      "LongDescription": "In Case Of Golf Emergency\r\n\r\n  Responsible motorists are ready for anything. With a trunk full of emergency kits, they're equipped to handle any traffic predicament, from minor injuries and flat tires to the sudden itch to hit the links. Last time we checked, monogrammed golf balls weren't a part of any roadside assistance coverage.\r\n  We respect the guy who can drive right past one of those sky-high driving range nets without giving into the nagging urge to knock a bucket of balls into next week. For everyone else, there's the Golf and Go Caddy Pack. Like a real golf caddy, it'll make carrying his golf gear much easier. Unlike a real golf caddy, he can conveniently shove it in the trunk between outings.\r\n  Whether he's heading to the executive course for a 9-hole \"sales meeting\" or spontaneously longing to work on his short game, he'll be fully prepared to golf and go. Crisis averted.\r\n\r\nNo Junk in This Trunk\r\n  \r\n\tHe’ll put it in \"P\" and arrive at the tee in no time flat with the polycanvas golf trunk organizer by Picnic at Ascot. Compact yet spacious, there’s a large, ventilated compartment for his spikes, tee holders, a slim zip pocket for valuables, and other storage sections.\r\n\tThe six-club silo carrier by Rival and Revel lets him tote his go-to clubs with no trouble. Golf bags are really just hazards with shoulder straps.\r\n\tWith 15 personalized Callaway Warbird 2.0 golf balls, there won't be any confusion as to whose ball is so close to the pin.\r\n\t\r\n  ",
+      "Contents": "Our Lasers Take Time\r\nThis personalized item requires 1 day of processing time.\r\n\r\n\r\n  Golf Organizer\r\n    15 Personalized Callaway Warbird Golf Balls\r\n  6 Club Holder\r\n\r\n",
+      "LongDescriptionHTML": "<h4>In Case Of Golf Emergency</h4>\r\n\r\n  <p>Responsible motorists are ready for anything. With a trunk full of emergency kits, they're equipped to handle any traffic predicament, from minor injuries and flat tires to the sudden itch to hit the links. Last time we checked, monogrammed golf balls weren't a part of any roadside assistance coverage.</p>\r\n  <p>We respect the guy who can drive right past one of those sky-high driving range nets without giving into the nagging urge to knock a bucket of balls into next week. For everyone else, there's the Golf and Go Caddy Pack. Like a real golf caddy, it'll make carrying his golf gear much easier. Unlike a real golf caddy, he can conveniently shove it in the trunk between outings.</p>\r\n  <p>Whether he's heading to the executive course for a 9-hole \"sales meeting\" or spontaneously longing to work on his short game, he'll be fully prepared to golf and go. Crisis averted.</p>\r\n\r\n<h4>No Junk in This Trunk</h4>\r\n  <ul>\r\n\t<li>He’ll put it in \"P\" and arrive at the tee in no time flat with the polycanvas golf trunk organizer by Picnic at Ascot. Compact yet spacious, there’s a large, ventilated compartment for his spikes, tee holders, a slim zip pocket for valuables, and other storage sections.</li>\r\n\t<li>The six-club silo carrier by Rival and Revel lets him tote his go-to clubs with no trouble. Golf bags are really just hazards with shoulder straps.</li>\r\n\t<li>With 15 personalized Callaway Warbird 2.0 golf balls, there won't be any confusion as to whose ball is so close to the pin.</li>\r\n\t\r\n  </ul>",
+      "Name": "Golf Ball Organizer",
+      "Path": "golf-and-go-caddy-pack",
+      "CanonicalUrl": "www.mancrates.com/store/products/golf-and-go-caddy-pack",
+      "ConversionRate": 1.5037593984962405,
+      "UniquePurchases": 28,
+      "ProductRevenue": 2799.72,
+      "Quantity": 28,
+      "AveragePrice": 99.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/931/large/MBC_MC_2018-4-Golf_WEB-2848.jpg?1526680541",
+      "Margin": 0,
+      "TerrainScore": 0.38366729688813683,
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTMC-0006-GOL",
+      "VariantName": "Personalized Golf Balls Crate",
+      "Price": 69.99,
+      "Inventory": 272,
+      "VariantStatus": "sellable",
+      "ProductId": 171,
+      "VariantId": 358,
+      "Path": "personalized-golf-ball-mini-crate",
+      "CanonicalUrl": "www.mancrates.com/store/products/personalized-golf-ball-mini-crate",
+      "ContentsHTML": "<h4>Tee it up</h4> <ul>\r\n  <li>30 monogrammed Callaway Warbird 2.0 golf balls</li>\r\n</ul>",
+      "LongDescription": "The Hole Nine Yards In a recent poll, golf balls ranked third among things men enjoy hitting most, lagging just behind “the gym” and “unrealistic sales goals.” But while those things may be tough to leave a mark on, leaving his mark on the course has never been easier.\r\n  \r\nEach ball is precisely monogrammed with our state-of-the-art UV printers and guaranteed to last at least as long as it takes him to lose them in a pond.\r\n\r\nThe Personalized Golf Balls Mini Crate contains 30 units of self-expression, each ready to be teed up like an easy golf pun and knocked out of the park like a mixed sports metaphor. Next time he hits the links, make sure he does it with more style than a pair of plaid pants.",
+      "Contents": "Tee it up \r\n  30 monogrammed Callaway Warbird 2.0 golf balls\r\n",
+      "LongDescriptionHTML": "<h4>The Hole Nine Yards<h4> <p>In a recent poll, golf balls ranked third among things men enjoy hitting most, lagging just behind “the gym” and “unrealistic sales goals.” But while those things may be tough to leave a mark on, leaving his mark on the course has never been easier.</p>\r\n  \r\n<p>Each ball is precisely monogrammed with our state-of-the-art UV printers and guaranteed to last at least as long as it takes him to lose them in a pond.</p>\r\n\r\n<p>The Personalized Golf Balls Mini Crate contains 30 units of self-expression, each ready to be teed up like an easy golf pun and knocked out of the park like a mixed sports metaphor. Next time he hits the links, make sure he does it with more style than a pair of plaid pants.</p>",
+      "Name": "Golf Balls Personalized Mini-Crate",
+      "ConversionRate": 6.115235065394132,
+      "UniquePurchases": 173,
+      "ProductRevenue": 12108.27,
+      "Quantity": 173,
+      "AveragePrice": 69.99,
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/935/large/IMG_4241-Edit-2.jpg?1508178691",
+      "Margin": 57.72,
+      "TerrainScore": 0.28545002849270285,
+      "TERRAINRANK": 10
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTCR-0054-GRW",
+      "VariantName": "Personalized Growler Crate",
+      "Price": 79.99,
+      "ProductId": 98,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-growler-crate",
+      "Contents": "<h4>Exploration Equipment</h4> <ul>\r\n  <li>Personalized Mini-Keg Growler, 64 oz</li>\r\n  <li>White Chalk Pencil</li>\r\n  <li>(2) Classic Pint Glasses</li>\r\n</ul> <h4>Drinking Buddies</h4> <ul>\r\n  <li>33 Bottles Of Beer Tasting Journal</li>\r\n  <li>Brew Candy</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Straight From The Source</h4> <p>Some quests are more honorable than others, and with all due respect to men collecting\r\n   stamps and state quarters, we're focusing on a far loftier goal: the quest to enjoy\r\n   every microbrew in America straight from the source.\r\n</p> <p>This journey, while extremely delicious, is also extremely difficult. A devout band of drinking buddies\r\n   must canoe for miles, caravan for weeks, and forsake all adult responsibilities\r\n   to achieve the fullness of flavor.\r\n</p> <p>These brave souls are our modern-day keg-quistadors in search of the mythical Fountain of Booze.</p> <h4>Jug Life</h4> <p>A knight would never ride into battle without his trusty steed, sharpened steel, and self-righteous\r\n   sense of divine approval, and neither should you embark upon the quest for quenched\r\n   thirst without a personalized steel growler.\r\n</p> <p>The road between breweries is long and dry, and only 64 oz. of cool, carbonated brew will carry your\r\n   spirits onward. Top it off at each stop, chalk details directly onto the mini-keg with the white\r\n   chalk pencil, and share generously with fellow pilgrims along the way in a pair\r\n   of classic screenprinted pint glasses.\r\n</p> <p>Always remember, your quest is valiant, and the growler is laser-etched with your name, so carry it with\r\n   pride throughout the land.\r\n</p> <h4>Drink Beers For \"Research\"</h4> <p>Your thoroughly documented taste will live forever in the annals of time in the 33 Bottles of Beer Book.\r\n   Log textures and flavors as you sip, and present the book upon entrance to any brewery to ensure they bring\r\n   out the good stuff.\r\n</p> <p>Get ye quest for eternal refreshment underway with the Personalized Growler Crate.</p>",
+      "Name": "Personalized Growler Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/748/large/pgc_personalized_growler_gifts_for_craft_beer_guys__01242.jpg?1502411176",
+      "TERRAINRANK": 1
+    },
+    {
+      "SKU": "KTCR-0007-BAR",
+      "VariantName": "Personalized Barware",
+      "Price": 99.99,
+      "ProductId": 129,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-barware-crate",
+      "Contents": "<h4>Home Bar Gear</h4> <ul>\r\n  <li>4 Personalized Pint Glasses</li>\r\n  <li>4 Personalized Wooden Coasters/Bottle Openers</li>\r\n</ul> <h4>Counter Chow</h4> <ul>\r\n  <li>Pistachios, 5 oz</li>\r\n  <li>BBQ Corn Nuggets, 4 oz</li>\r\n  <li>Beer Nuts Bar Mix, 3.25 oz</li>\r\n  <li>CB's Lightly Salted Ballpark Peanuts, 12 oz</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Greatness Has A Name</h4> <p>When the first humans to scale Mount Everest reached the summit, they didn't\r\n   immediately update their wikipedia pages or take selfies with self-aggrandizing\r\n   hashtags. They celebrated their dominance over nature like true men--by cracking\r\n   open a beer and chiseling their names into the icy death they'd conquered.\r\n</p> <p>A man's name isn't just a label. It's a shorthand celebration of his greatest accomplishments.</p> <h4>This Time It's Personal</h4> <p>Sure, Barry from high school, voted \"Most Likely to Succeed,\" might drive a fancy European sports car to\r\n   his fat cat Wall Street job, but does Barry from high school have his own set of personalized pint glasses?\r\n</p> <p>Probably not. He probably drinks from non-personalized glasses like an uncultured chump. </p> <p>We've acquired that monstrous laser from \"Goldfinger\" and repurposed its settings from burning James Bond's\r\n   giblets to etching names into pint glasses with perfect precision.\r\n</p> <p>So while Barry's crying alone in his mansion over a frozen microwave dinner, you can be toasting real\r\n   success with three close buddies and four awesome personalized pint glasses.\r\n</p> <h4>The Man, The Myth, The Legendary Coasters</h4> <p>The matching set of personalized wooden coasters are classy and clean--like drying your tabletops with bear\r\n   skin napkins. Plus, they double as bottle-openers, which means less time scavenging in drawers and more\r\n   time swapping epic drinking stories. Like when you once wrestled a croc while wearing Crocs purely out of\r\n   hubris.\r\n</p> <p>And we've got snacks with your name on them. Figuratively. We used to personalize every individual nut and\r\n   pretzel, but they got inhaled too quickly for anyone to notice.\r\n</p> <p>Grab the Personalized Barware Crate today and ensure the world never forgets your name.</p>",
+      "Name": "Personalized Barware Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/884/large/pb_personalized_pint_giftset_for_beer_loving_guys__44982.jpg?1502411232",
+      "TERRAINRANK": 2
+    },
+    {
+      "SKU": "KTMC-0003-MUG",
+      "VariantName": "Personalized Mug Mini Crate",
+      "Price": 49.99,
+      "ProductId": 49,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-mug-mini-crate",
+      "Contents": "<h4>Our Lasers Take Time</h4> \r\n<p>Personalized items require 2 days of processing time.</p>\r\n<br><br>\r\n\r\n\r\n\r\n\r\n<h4>Coffee Crew</h4> <ul>\r\n  <li>Brushed Silver Glacier Camp Mug, 15 oz</li>\r\n  <li>Ultralight Java Drip Coffee Maker</li>\r\n  <li>Warrior Select Coffee Sample Pack, 2 oz</li>\r\n</ul>",
+      "LongDescription": "<h4>Life of a Dripster</h4> <p>Some people wake up with coffee, and some people wake up for coffee.</p> <p>With the former, coffee acts as a stable morning ritual: a caffeinated breakfast complement, or the\r\n   patient carpool companion on the morning commute. With the latter, coffee is an\r\n   all-encompassing religion: the ground of bean by which all existence and meaning\r\n   flow.\r\n</p> <p>These coffee-devotees are known as \"dripsters,\" and they hold bean quality and brewing methodology to the\r\n   highest possible standard. They refuse to compromise their values, and thus, the Personalized Mug Mini\r\n   Crate is the dripster's dream come true.\r\n</p> <h4>Small Batch, Big World</h4> <p>No dripster has fully received coffee communion until they've drank from their very own personalized mug.\r\n   This 15 oz. stainless steel mug proudly proclaims caffeine devotion to the world and\r\n   can be laser-etched with the given family name or a newly christened dripster name.\r\n</p> <p>Forever gone are the dark days of pouring commoner's caffeine from the office coffee pot. With the portable\r\n   GSI Java Drip and Alpha coffee grinds, the dripster can now indulge in the perky perks of small-batch, pour\r\n   over coffee anywhere.\r\n</p> <p>The greater telos of coffee has been achieved in the Personalized Mug Mini Crate.</p>",
+      "Name": "Personalized Mug",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/535/large/eb_mc_PersonalizedMug_web-8339.jpg?1518734705",
+      "TERRAINRANK": 3
+    },
+    {
+      "SKU": "KTCR-0037-WHA",
+      "VariantName": "Whiskey Appreciation Crate",
+      "Price": 159.99,
+      "ProductId": 137,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/whiskey-appreciation-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>Personalized Whiskey Decanter <br>(hand-made, may contain minor imperfections)</li>\r\n  <li>2 Personalized Heavy Bottom Rocks Glasses, 9 oz</li>\r\n  <li>2 Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Spiced Peppercorn Peanuts</li>\r\n  <li>Salted Pistachios</li>\r\n  <li>Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours to process.</i></p>",
+      "LongDescription": "<h4>An Executive Appreciation</h4> <p>In 1797, George Washington, the Michael Jordan of being American, declined the free\r\n   world's greatest honor, a Presidential term three-peat, in order to build a whiskey\r\n   distillery in his basement. The Revolutionary War MVP and celebrity endorser of\r\n   the one dollar bill knew that no amount of prestige or accomplishments could rival\r\n   the warm satisfaction of a good glass of whiskey.\r\n</p> <p>In days past, a man's fondness for whiskey was admirably brandished in full home bars, but in modern times,\r\n   whiskey is hidden out of sight in cabinets and desk drawers like shameful secrets. The Whiskey Appreciation\r\n   Crate is here to restore honor to the once great bond between a man and his drink.\r\n</p> <h4>Oh, yes we de-can!</h4> <p>Etching your initials into a glass decanter is a public declaration of your affinity for whiskey.\r\n   It's like donning a trenchcoat and holding a boombox overhead blasting Peter Gabriel's\r\n   \"In Your Eyes\" outside of whiskey's house or barging past the TSA checkpoint to frantically\r\n   sprint through the airport terminal for a last second  whiskey\r\n   before boarding your plane.\r\n</p> <p>While the monogrammed decanter looks super classy when flanked by its matching pair of personalized\r\n   rocks tumblers, whiskey should be appraised by taste as well as  presentation. The decanter properly\r\n   aerates and settles your whiskey so you can settle down with a glass of good company anytime.\r\n</p> <h4>Good Company</h4> <p>Rounding out the Whiskey Appreciation Crate is the ultimate whiskey connoisseur collection: A pair of\r\n   Tovolo Ice Molds and slate coasters, a pocket-sized whiskey tasting journal, and the most important whiskey\r\n   accessory, premium savory snacks.\r\n</p> <p>Box up those dusty sports trophies and find a stud to hang your awkward family portraits, because the\r\n   Personalized Whiskey Decanter is reclaiming whiskey's proper place atop your mantel.\r\n</p>",
+      "Name": "Personalized Whiskey Appreciation Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/898/large/wa_engraved_whiskey_gift_collection_for_bold_men__89003.1479337561.1280.1280_copy.jpg?1505426047",
+      "TERRAINRANK": 4
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "VariantName": "Personalized Pint Set Ammo Can",
+      "Price": 64.99,
+      "ProductId": 20,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-pint-set-ammo-can",
+      "Contents": "<h4>Beer Buddies</h4> <ul>\r\n  <li>2 Laser-Etched Pint Glasses</li>\r\n  <li>Personalized .50 Cal Bottle Opener</li>\r\n</ul> <h4>Beef Sticks</h4> <ul>\r\n  <li>Peppered Jerky Stick</li>\r\n  <li>Original Jerky Stick</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The World Is His Man Cave</h4> <p>A man's insatiable appetite for adventure will lead him to Earth's highest peaks,\r\n   deepest caverns, and soon, neighboring planets--but none of these places adequately\r\n   cater to his second-most pressing appetite: beer.\r\n</p> <p>But we've built a gift\r\n   that lets him have it all. Whether he's crag climbing, spelunking, or riding a rocket\r\n   to the grand opening of Raging Waters: Mars, the Personalized Pint Set Ammo Can\r\n   will always ensure an awesome pint by his side.\r\n</p> <h4>Go Forth And Drink</h4> <p>With the Personalized Pint Set Ammo Can, he'll never have to endure the harsh\r\n   humiliation of asking, \"where can a man get a decent drink around here?\" because\r\n   he'll always have a pair of personalized, laser-etched pint glasses tucked safely\r\n   in the indestructible ammo can handcuffed to his wrist.\r\n</p> <p>There's only one\r\n   bottle opener that can withstand the intrepid demand of the adventurous man, and\r\n   that's the personalized bullet bottle opener. This .50 caliber bullet with his name\r\n   engraved on the side is the second coolest way to open a beer with a bullet. And\r\n   man cannot live on beer alone, which is where the two delicious beef sticks come\r\n   into play.\r\n</p> <p>The Personalized Pint Set Ammo Can has all the essentials he'll\r\n   need to get his beers and best buds out of the house and into the world.\r\n</p>",
+      "Name": "Personalized Barware Ammo Can",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/420/large/ppsac_awesome-personalized-pint-pair-gift-for-men__88533.jpg?1502411051",
+      "TERRAINRANK": 5
+    },
+    {
+      "SKU": "KTCR-0009-PWH",
+      "VariantName": "Personalized Whiskey Crate",
+      "Price": 119.99,
+      "ProductId": 84,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-whiskey-crate",
+      "Contents": "<h4>Distinguished Gear</h4> <ul>\r\n  <li>2 Personalized, Heavy-Bottom Rocks Glasses, 9 oz.</li>\r\n  <li>2 Tovolo Ice Sphere Molds</li>\r\n  <li>2 Slate Coasters</li>\r\n  <li>33 Drams Whiskey Drinking Journal</li>\r\n</ul> <h4>Luxury Grub</h4> <ul>\r\n  <li>Squirrel Brand Spiced Peppercorn Peanuts</li>\r\n  <li>Wonderful Salted Pistachios</li>\r\n  <li>Sahale Snacks Cranberry Pecans</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>The Sophisticated Man</h4> <p>Men aren't born dressed in a sharp tailored suit with a Cuban in hand. Even Frank Sinatra,\r\n   before he was the suave sultan Frank Sinatra, was once young Francis Albert, captain\r\n   of the chess club with enough barbed wire lining his teeth to fence off a Toluca\r\n   cattle ranch.\r\n</p> <p>The transformation into manhood, like most worthwhile ventures in life, begins with a strong drink.\r\n</p> <h4>Bold Bravado</h4> <p>Handing a guest a drink is like demonstrating a firm handshake in a job interview\r\n   or warming up with one-fingered push-ups before an underground kung-fu death showdown.\r\n   It's a functional maneuver to establish a relaxed, confident presence.\r\n</p> <p>This set of square whiskey glasses are intentionally bottom-loaded to flaunt your gravitas.\r\n   And we'll laser etch your name into the thick glass so no one will forget whose sophisticated\r\n   jazz flute skills they were admiring all night.\r\n</p> <p>Science bests nature once again with the Tovolo ice molds. These pristine ice crystal spheres\r\n   have a slower melting rate, keeping your whiskey chilled longer and tasting stronger.\r\n   And aesthetically they pair perfectly with the solid slate coasters, the marble\r\n   floors of the coaster world, to give your whiskey experience a more rugged, natural\r\n   ambiance.\r\n</p> <h4>Cultured Accompaniments</h4> <p>Whiskey is a flavor bully, and your childish gas station junk foods will get\r\n   knocked over in its bold wake. These salted pistachios, spiced peppercorn peanuts, and sweet and spicy\r\n   pecans are snacks for the mature, the perfect compliment to any whiskey.\r\n</p> <p>And use the drinking journal to scribble notes for the whiskey blog you're thinking\r\n   about starting, or just let it peek out of your pocket so people think you have\r\n   a whiskey blog. Just as rewarding with much less work.\r\n</p> <p>The road to classy refinement is not for the weak of taste, and it begins with the Personalized\r\n   Whiskey Man Crate.\r\n</p>",
+      "Name": "Personalized Whiskey Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/689/large/pw_sophisticated_whiskey_gifts_for_claseey_guys__10836.jpg?1502411151",
+      "TERRAINRANK": 6
+    },
+    {
+      "SKU": "KTCR-0036-STE",
+      "VariantName": "Personalized Oktoberfest Stein",
+      "Price": 69.99,
+      "ProductId": 64,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-oktoberfest-stein",
+      "Contents": "<h4>Personal Beer Barrel</h4> <ul>\r\n  <li>Personalized Oktoberfest Stein</li>\r\n  <li>(2) Oktoberfest-Themed Coasters/Bottle Openers</li>\r\n</ul> <h4>Deutschland Delicacies</h4> <ul>\r\n  <li>Saverne Artisanal \"Craft Beer\" Kraut</li>\r\n  <li>Bavarian Salami Sausage</li>\r\n  <li>Bavarian Summer Sausage</li>\r\n  <li>Inglehoffer Stone Ground Mustard</li>\r\n  <li>East Shore Pretzel Bites</li>\r\n</ul>\r\n<p><i><b>NOTE:</b> Personalized items require 48 hours of processing time.</i></p>",
+      "LongDescription": "<h4>Oktober State of Mind</h4> <p>Oktoberfest, the 17-day stein-clanking, pretzel-munching pride and joy of Germany, is actually\r\n   very American when you think about it. Nothing screams \"Freedom!\" louder than gorging\r\n   one's self on another culture's delicacies while drinking liters gallons of beer in a foreign land with friends\r\n   and festive strangers.\r\n</p> <p>In true American fashion, we've decided to do Oktoberfest better than the people who invented it by making\r\n   it last longer--much longer. The Oktoberfest Man Crate is America's greatest innovation: 365 Days of\r\n   Oktoberfest.\r\n</p> <h4>Der Biermeister</h4> <p>Say what you will about Germans, their outlandish haircuts, and complete inability to comprehend sarcasm\r\n   (and believe us, we do), but those Deutschlanders sure know how to appreciate a good brew. The glass\r\n   stein is reserved for the no-nonsense beer drinker.\r\n</p> <p>Forever unite yourself with the Spirit of Oktober by etching your name into a glass Oktoberfest stein.\r\n   And for the record, just because this mammoth of a mug can hold enough beer for\r\n   two does not mean you're obligated to share. Your name is permanently engraved on\r\n   it for a reason.\r\n</p> <p>The crate also contains two Oktoberfest stein-sized coaster/bottle openers. One to rest underneath your\r\n   personalized stein, and another to get your reload primed for pouring.\r\n</p> <h4>Snacktober</h4> <p>It's not Oktober unless you're importing Germany's finest traditional foods like Bavarian salami\r\n   and summer sausage, pretzels, and Inglehoffer Stone Ground Mustard straight into your chomper chamber. And\r\n   if you're looking for \"authentisch Sauerkraut\", Saverne's Artisanal \"Craft Beer\" Kraut is as authentically\r\n   German as a jolly mountaineer prancing around in Lederhosen yodeling David Hasselhoff's \"Looking for\r\n   Freedom\".\r\n</p> <p>Keep Oktober as your state of mind all the time with the Oktoberfest Crate.</p>",
+      "Name": "Personalized Oktoberfest Stein Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/599/large/okt-s-personalized-stein-and-snack-gifts-for-men__91353.jpg?1502411116",
+      "TERRAINRANK": 7
+    },
+    {
+      "SKU": "KTHB-0001-FLV",
+      "VariantName": "Personalized Flask: Vampire Desires",
+      "Price": 39.99,
+      "ProductId": 117,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/secret-stash-personalized-flask",
+      "Contents": "<h4>Our Lasers Take Time</h4> \r\n<p>This Personalized item requires 1 day of processing time.</p>\r\n<br><br>\r\n\r\n\r\n\r\n<h4>Home Security System</h4> <ul>\r\n  <li>Personalized Flask</li>\r\n  <li>Secret Stash Book</li>\r\n  <li>Your Choice of a Custom Dust Jacket</li>\r\n</ul>",
+      "LongDescription": "<h4>A Brilliant Ruse</h4> <p>Sometime books make great gifts, like the driving manual for a Jaguar F-Type with accompanying\r\n   vehicle. But most of the time, books gifts are boring and should be avoided.\r\n</p> <p>If it's a book you're certain he wants, then maybe. But if it's a book you just\r\n   think he'll like, there are cheaper ways to prop up a table. It's a celebration,\r\n   not a summer reading list.\r\n</p> <p>We've concocted a brilliant ruse that plays on humanity's widespread discomfort with the extremely longform\r\n   written word. The Secret Stash Personalized Flask takes him from dustjacket disappointment to actual lived\r\n   adventures with the simple turn of a page.\r\n</p> <h4>An Intoxicating Story</h4> <p>We've been told to judge a book not by its cover, but by the contents of its pages. Well,\r\n   these pages conceal a personalized drinking vessel, so it's basically an instant literary classic. Housed\r\n   within the pages itself is a sleek 6 oz. stainless steel flask.\r\n</p> <p>And we've penned our own literary masterpiece by lasering onto the matte black finish. The only thing about\r\n   this gift he'll have to read is his name.\r\n</p> <p>Best of all, the book can be re-used as a \"security-by-obscurity\" safety-deposit book.</p> <h4>Too Good To Be True</h4> <p>To up the outrage factor before the big reveal, we've created some phoney dust jackets that will raise far\r\n   more questions than answers. Choose which of these three terrible books he'll have to awkwardly pretend to\r\n   enjoy receiving:\r\n</p> <ul>\r\n  <li> Vampire Desires, a gripping romance-fantasy adventure of immortal love, loss, and lust;</li>\r\n  <li> Have You Seen My Keys, the latest installment of the unacclaimed and unrequested Sherluck Holmes\r\n       mystery series\r\n  </li>\r\n  <li> How to Hide Your Stuff, a simpleton's conspiracy theory/self-help book from the paranoid mind of one\r\n       Jedd Dangus\r\n  </li>\r\n</ul> <p>And if he has concerns about displaying any of these on his bookshelf, we've printed Plan B directly onto\r\n   the spine of the book. He can remove the dust jacket and hide in plain sight the inconspicuous book, Biting\r\n   Your Neighbor's Horse: and other confusing euphemisms.\r\n</p> <p>The Secret Stash Personalized Flask is an unforgettable gift of surprise and safekeeping.</p>",
+      "Name": "Personalized Flask in Book Vampires",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/000/833/large/Flask-Inside-book__41814.jpg?1502411212",
+      "TERRAINRANK": 8
+    },
+    {
+      "SKU": "KTBX-0025-GOO",
+      "VariantName": "Golf and Go Caddy Pack",
+      "Price": 99.99,
+      "ProductId": 238,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/golf-and-go-caddy-pack",
+      "Contents": "<h4>Our Lasers Take Time</h4>\r\n<p>This personalized item requires 1 day of processing time.</p>\r\n\r\n<ul>\r\n  <li>Golf Organizer</li>\r\n    <li>15 Personalized Callaway Warbird Golf Balls</li>\r\n  <li>6 Club Holder</li>\r\n\r\n</ul>",
+      "LongDescription": "<h4>In Case Of Golf Emergency</h4>\r\n\r\n  <p>Responsible motorists are ready for anything. With a trunk full of emergency kits, they're equipped to handle any traffic predicament, from minor injuries and flat tires to the sudden itch to hit the links. Last time we checked, monogrammed golf balls weren't a part of any roadside assistance coverage.</p>\r\n  <p>We respect the guy who can drive right past one of those sky-high driving range nets without giving into the nagging urge to knock a bucket of balls into next week. For everyone else, there's the Golf and Go Caddy Pack. Like a real golf caddy, it'll make carrying his golf gear much easier. Unlike a real golf caddy, he can conveniently shove it in the trunk between outings.</p>\r\n  <p>Whether he's heading to the executive course for a 9-hole \"sales meeting\" or spontaneously longing to work on his short game, he'll be fully prepared to golf and go. Crisis averted.</p>\r\n\r\n<h4>No Junk in This Trunk</h4>\r\n  <ul>\r\n\t<li>He’ll put it in \"P\" and arrive at the tee in no time flat with the polycanvas golf trunk organizer by Picnic at Ascot. Compact yet spacious, there’s a large, ventilated compartment for his spikes, tee holders, a slim zip pocket for valuables, and other storage sections.</li>\r\n\t<li>The six-club silo carrier by Rival and Revel lets him tote his go-to clubs with no trouble. Golf bags are really just hazards with shoulder straps.</li>\r\n\t<li>With 15 personalized Callaway Warbird 2.0 golf balls, there won't be any confusion as to whose ball is so close to the pin.</li>\r\n\t\r\n  </ul>",
+      "Name": "Golf Ball Organizer",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/002/931/large/MBC_MC_2018-4-Golf_WEB-2848.jpg?1526680541",
+      "TERRAINRANK": 9
+    },
+    {
+      "SKU": "KTMC-0006-GOL",
+      "VariantName": "Personalized Golf Balls Crate",
+      "Price": 69.99,
+      "ProductId": 171,
+      "CanonicalUrl": "https://www.mancrates.com/store/products/personalized-golf-ball-mini-crate",
+      "Contents": "<h4>Tee it up</h4> <ul>\r\n  <li>30 monogrammed Callaway Warbird 2.0 golf balls</li>\r\n</ul>",
+      "LongDescription": "<h4>The Hole Nine Yards<h4> <p>In a recent poll, golf balls ranked third among things men enjoy hitting most, lagging just behind “the gym” and “unrealistic sales goals.” But while those things may be tough to leave a mark on, leaving his mark on the course has never been easier.</p>\r\n  \r\n<p>Each ball is precisely monogrammed with our state-of-the-art UV printers and guaranteed to last at least as long as it takes him to lose them in a pond.</p>\r\n\r\n<p>The Personalized Golf Balls Mini Crate contains 30 units of self-expression, each ready to be teed up like an easy golf pun and knocked out of the park like a mixed sports metaphor. Next time he hits the links, make sure he does it with more style than a pair of plaid pants.</p>",
+      "Name": "Golf Balls Personalized Mini-Crate",
+      "ImageLink": "https://d2cbksjv2nsc09.cloudfront.net/photos/assets/000/001/935/large/IMG_4241-Edit-2.jpg?1508178691",
+      "TERRAINRANK": 10
+    }
+  ],
+  "template": {
+    "id": 28,
+    "lastModified": "2018-07-24T20:06:32.555Z",
+    "createdAt": "2018-07-10T20:14:42.803Z",
+    "archived": false,
+    "templateName": "Personalized - Iterable Export",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "SKU"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "VariantName"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "Inventory"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "VariantStatus"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "ProductId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "VariantId"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Path"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ContentsHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "LongDescription"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Contents"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "LongDescriptionHTML"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "Name"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "15",
+                  "value": {
+                    "id": 15,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "16",
+                  "value": {
+                    "id": 16,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "17",
+                  "value": {
+                    "id": 17,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "18",
+                  "value": {
+                    "id": 18,
+                    "fields": [
+                      [
+                        "AveragePrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "19",
+                  "value": {
+                    "id": 19,
+                    "fields": [
+                      [
+                        "ImageLink"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "20",
+                  "value": {
+                    "id": 20,
+                    "fields": [
+                      [
+                        "Margin"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "21",
+                  "value": {
+                    "id": 21,
+                    "fields": [
+                      [
+                        "TERRAINRANK"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "22",
+                  "value": {
+                    "id": 22,
+                    "fields": [
+                      [
+                        "CanonicalUrl"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "https://",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 22,
+            "uidNode": 23,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "Path"
+                ],
+                7
+              ],
+              [
+                [
+                  "Price"
+                ],
+                2
+              ],
+              [
+                [
+                  "Name"
+                ],
+                13
+              ],
+              [
+                [
+                  "LongDescriptionHTML"
+                ],
+                12
+              ],
+              [
+                [
+                  "VariantId"
+                ],
+                6
+              ],
+              [
+                [
+                  "LongDescription"
+                ],
+                10
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                16
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                14
+              ],
+              [
+                [
+                  "Margin"
+                ],
+                20
+              ],
+              [
+                [
+                  "TERRAINRANK"
+                ],
+                21
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                15
+              ],
+              [
+                [
+                  "ProductId"
+                ],
+                5
+              ],
+              [
+                [
+                  "SKU"
+                ],
+                0
+              ],
+              [
+                [
+                  "VariantStatus"
+                ],
+                4
+              ],
+              [
+                [
+                  "ContentsHTML"
+                ],
+                9
+              ],
+              [
+                [
+                  "CanonicalUrl"
+                ],
+                8
+              ],
+              [
+                [
+                  "ImageLink"
+                ],
+                19
+              ],
+              [
+                [
+                  "VariantName"
+                ],
+                1
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                17
+              ],
+              [
+                [
+                  "Contents"
+                ],
+                11
+              ],
+              [
+                [
+                  "AveragePrice"
+                ],
+                18
+              ],
+              [
+                [
+                  "Inventory"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "VariantName"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Inventory"
+                ]
+              ],
+              [
+                4,
+                [
+                  "VariantStatus"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ProductId"
+                ]
+              ],
+              [
+                6,
+                [
+                  "VariantId"
+                ]
+              ],
+              [
+                7,
+                [
+                  "Path"
+                ]
+              ],
+              [
+                8,
+                [
+                  "CanonicalUrl"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Contents"
+                ]
+              ],
+              [
+                10,
+                [
+                  "LongDescription2"
+                ]
+              ],
+              [
+                11,
+                [
+                  "Contents2"
+                ]
+              ],
+              [
+                12,
+                [
+                  "LongDescription"
+                ]
+              ],
+              [
+                13,
+                [
+                  "Name"
+                ]
+              ],
+              [
+                14,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                15,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                16,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                17,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                18,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                19,
+                [
+                  "ImageLink"
+                ]
+              ],
+              [
+                20,
+                [
+                  "Margin"
+                ]
+              ],
+              [
+                21,
+                [
+                  "TERRAINRANK"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "string"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "string"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ],
+              [
+                14,
+                "number"
+              ],
+              [
+                15,
+                "number"
+              ],
+              [
+                16,
+                "number"
+              ],
+              [
+                17,
+                "number"
+              ],
+              [
+                18,
+                "number"
+              ],
+              [
+                19,
+                "string"
+              ],
+              [
+                20,
+                "number"
+              ],
+              [
+                21,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                true
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ],
+              [
+                14,
+                false
+              ],
+              [
+                15,
+                false
+              ],
+              [
+                16,
+                false
+              ],
+              [
+                17,
+                false
+              ],
+              [
+                18,
+                false
+              ],
+              [
+                19,
+                true
+              ],
+              [
+                20,
+                false
+              ],
+              [
+                21,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                14,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                15,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                16,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                17,
+                {
+                  "etlType": "Integer"
+                }
+              ],
+              [
+                18,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                19,
+                {
+                  "etlType": "String"
+                }
+              ],
+              [
+                20,
+                {
+                  "etlType": "Number"
+                }
+              ],
+              [
+                21,
+                {
+                  "etlType": "Integer"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Algorithm",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "algorithmId": 26
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Fs",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "Products.*",
+          "fieldOrdering": [
+            "SKU",
+            "VariantName",
+            "Price",
+            "ProductId",
+            "CanonicalUrl",
+            "Contents",
+            "LongDescription",
+            "Name",
+            "ImageLink",
+            "TERRAINRANK"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {},
+        "integrationId": 20,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  }
+}

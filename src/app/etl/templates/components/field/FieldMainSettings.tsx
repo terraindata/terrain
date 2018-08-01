@@ -45,15 +45,28 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
+import * as classNames from 'classnames';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import
+{
+  _TemplateField,
+  TemplateField,
+} from 'etl/templates/FieldTypes';
+import LanguageUI from 'etl/templates/languages/LanguageUI';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes, etlFieldTypesList, etlFieldTypesNames, Languages } from 'shared/etl/types/ETLTypes';
+import { etlFieldTypesList, etlFieldTypesNames, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -68,7 +81,7 @@ interface SettingsState
 {
   fieldName: string;
   isPrimaryKey: boolean;
-  type: ETLFieldTypes;
+  type: FieldTypes;
 }
 
 class FieldMainSettings extends TemplateEditorField<Props>

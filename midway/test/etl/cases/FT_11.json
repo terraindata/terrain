@@ -1,0 +1,996 @@
+{
+  "testName": "FT_11",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "Title": " Crouch St",
+      "Price": "235000",
+      "Bedrooms": "0",
+      "Bathrooms": "0",
+      "SqFootage": "0",
+      "PropertyType": "Land",
+      "AgentEmail": "kevinlaurent@firstteam.com",
+      "AgentID": "30192",
+      "Address1": " Crouch St",
+      "Address2": "Oceanside CA 92054",
+      "URL": "https://www.firstteam.com/listing/160005480",
+      "PropertyID": "163233",
+      "MLSNo": "160005480",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A45P3/160005480.jpg"
+    },
+    {
+      "Title": "3528 Nettle Pl",
+      "Price": "928000",
+      "Bedrooms": "3",
+      "Bathrooms": "3.00",
+      "SqFootage": "3214",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "gregfarrell@firstteam.com",
+      "AgentID": "31346",
+      "Address1": "3528 Nettle Pl",
+      "Address2": "Fallbrook CA 92028",
+      "URL": "https://www.firstteam.com/listing/180015317",
+      "PropertyID": "177979",
+      "MLSNo": "180015317",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A699P1/180015317.jpg"
+    },
+    {
+      "Title": "3528 Nettle Pl",
+      "Price": "928000",
+      "Bedrooms": "3",
+      "Bathrooms": "3.00",
+      "SqFootage": "3214",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "gregfarrell@firstteam.com",
+      "AgentID": "31346",
+      "Address1": "3528 Nettle Pl",
+      "Address2": "Fallbrook CA 92028",
+      "URL": "https://www.firstteam.com/listing/180015317",
+      "PropertyID": "177979",
+      "MLSNo": "180015317",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A40P1/180015317.jpg"
+    },
+    {
+      "Title": "3834 Cedar Vale Way",
+      "Price": "829000",
+      "Bedrooms": "3",
+      "Bathrooms": "3.00",
+      "SqFootage": "3214",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "gregfarrell@firstteam.com",
+      "AgentID": "31346",
+      "Address1": "3834 Cedar Vale Way",
+      "Address2": "Fallbrook CA 92028",
+      "URL": "https://www.firstteam.com/listing/180019201",
+      "PropertyID": "178477",
+      "MLSNo": "180019201",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A699P1/180019201.jpg"
+    },
+    {
+      "Title": "3834 Cedar Vale Way",
+      "Price": "829000",
+      "Bedrooms": "3",
+      "Bathrooms": "3.00",
+      "SqFootage": "3214",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "gregfarrell@firstteam.com",
+      "AgentID": "31346",
+      "Address1": "3834 Cedar Vale Way",
+      "Address2": "Fallbrook CA 92028",
+      "URL": "https://www.firstteam.com/listing/180019201",
+      "PropertyID": "178477",
+      "MLSNo": "180019201",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A40P1/180019201.jpg"
+    },
+    {
+      "Title": "4065 Aidan Cir",
+      "Price": "999900",
+      "Bedrooms": "4",
+      "Bathrooms": "3.00",
+      "SqFootage": "2800",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "doug@dougwestgroup.com",
+      "AgentID": "7453",
+      "Address1": "4065 Aidan Cir",
+      "Address2": "Carlsbad CA 92008",
+      "URL": "https://www.firstteam.com/listing/180026846",
+      "PropertyID": "179295",
+      "MLSNo": "180026846",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A699P1/180026846.jpg"
+    },
+    {
+      "Title": "4065 Aidan Cir",
+      "Price": "999900",
+      "Bedrooms": "4",
+      "Bathrooms": "3.00",
+      "SqFootage": "2800",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "doug@dougwestgroup.com",
+      "AgentID": "7453",
+      "Address1": "4065 Aidan Cir",
+      "Address2": "Carlsbad CA 92008",
+      "URL": "https://www.firstteam.com/listing/180026846",
+      "PropertyID": "179295",
+      "MLSNo": "180026846",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A30P1/180026846.jpg"
+    },
+    {
+      "Title": "1044 Breakaway Dr",
+      "Price": "650000",
+      "Bedrooms": "3",
+      "Bathrooms": "3.00",
+      "SqFootage": "3080",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "doug@dougwestgroup.com",
+      "AgentID": "7453",
+      "Address1": "1044 Breakaway Dr",
+      "Address2": "Oceanside CA 92057",
+      "URL": "https://www.firstteam.com/listing/180029154",
+      "PropertyID": "179545",
+      "MLSNo": "180029154",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A1372P1/180029154.jpg"
+    },
+    {
+      "Title": "1044 Breakaway Dr",
+      "Price": "650000",
+      "Bedrooms": "3",
+      "Bathrooms": "3.00",
+      "SqFootage": "3080",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "doug@dougwestgroup.com",
+      "AgentID": "7453",
+      "Address1": "1044 Breakaway Dr",
+      "Address2": "Oceanside CA 92057",
+      "URL": "https://www.firstteam.com/listing/180029154",
+      "PropertyID": "179545",
+      "MLSNo": "180029154",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A47P1/180029154.jpg"
+    },
+    {
+      "Title": "1168 Breakaway Dr",
+      "Price": "650000",
+      "Bedrooms": "4",
+      "Bathrooms": "4.00",
+      "SqFootage": "2446",
+      "PropertyType": "Single-Family Res.",
+      "AgentEmail": "doug@dougwestgroup.com",
+      "AgentID": "7453",
+      "Address1": "1168 Breakaway Dr",
+      "Address2": "Oceanside CA 92057",
+      "URL": "https://www.firstteam.com/listing/180033601",
+      "PropertyID": "180006",
+      "MLSNo": "180033601",
+      "PropertyPhoto": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A1372P1/180033601.jpg"
+    }
+  ],
+  "outputDocs": [
+    {
+      "MlsId": "160005480",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A45P3/160005480.jpg"
+    },
+    {
+      "MlsId": "180015317",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A699P1/180015317.jpg"
+    },
+    {
+      "MlsId": "180015317",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A40P1/180015317.jpg"
+    },
+    {
+      "MlsId": "180019201",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A699P1/180019201.jpg"
+    },
+    {
+      "MlsId": "180019201",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A40P1/180019201.jpg"
+    },
+    {
+      "MlsId": "180026846",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A699P1/180026846.jpg"
+    },
+    {
+      "MlsId": "180026846",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A30P1/180026846.jpg"
+    },
+    {
+      "MlsId": "180029154",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A1372P1/180029154.jpg"
+    },
+    {
+      "MlsId": "180029154",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/sandicor.pix/A47P1/180029154.jpg"
+    },
+    {
+      "MlsId": "180033601",
+      "ImageUrl": "http://propphoto.firstteam.com/ftwebmls/mrmls2.pix/A1372P1/180033601.jpg"
+    }
+  ],
+  "template": {
+    "id": 15,
+    "lastModified": "2018-07-10T00:29:19.533Z",
+    "createdAt": "2018-05-31T00:22:53.105Z",
+    "archived": false,
+    "templateName": "Listings Spacio Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "Price"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "Bedrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "Bathrooms"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "SqFootage"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "AgentID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "PropertyID"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "Title"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "PropertyType"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "AgentEmail"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "Address1"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Address2"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "URL"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "PropertyPhoto"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "14",
+                  "value": {
+                    "id": 14,
+                    "fields": [
+                      [
+                        "MLSNo"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 14,
+            "uidNode": 15,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "PropertyPhoto"
+                ],
+                13
+              ],
+              [
+                [
+                  "Price"
+                ],
+                1
+              ],
+              [
+                [
+                  "Title"
+                ],
+                0
+              ],
+              [
+                [
+                  "PropertyID"
+                ],
+                11
+              ],
+              [
+                [
+                  "Bathrooms"
+                ],
+                3
+              ],
+              [
+                [
+                  "MLSNo"
+                ],
+                12
+              ],
+              [
+                [
+                  "PropertyType"
+                ],
+                5
+              ],
+              [
+                [
+                  "Address1"
+                ],
+                8
+              ],
+              [
+                [
+                  "AgentEmail"
+                ],
+                6
+              ],
+              [
+                [
+                  "Bedrooms"
+                ],
+                2
+              ],
+              [
+                [
+                  "URL"
+                ],
+                10
+              ],
+              [
+                [
+                  "AgentID"
+                ],
+                7
+              ],
+              [
+                [
+                  "Address2"
+                ],
+                9
+              ],
+              [
+                [
+                  "SqFootage"
+                ],
+                4
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "Title"
+                ]
+              ],
+              [
+                1,
+                [
+                  "Price"
+                ]
+              ],
+              [
+                2,
+                [
+                  "Bedrooms"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Bathrooms"
+                ]
+              ],
+              [
+                4,
+                [
+                  "SqFootage"
+                ]
+              ],
+              [
+                5,
+                [
+                  "PropertyType"
+                ]
+              ],
+              [
+                6,
+                [
+                  "AgentEmail"
+                ]
+              ],
+              [
+                7,
+                [
+                  "AgentID"
+                ]
+              ],
+              [
+                8,
+                [
+                  "Address1"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Address2"
+                ]
+              ],
+              [
+                10,
+                [
+                  "URL"
+                ]
+              ],
+              [
+                11,
+                [
+                  "PropertyID"
+                ]
+              ],
+              [
+                12,
+                [
+                  "MlsId"
+                ]
+              ],
+              [
+                13,
+                [
+                  "ImageUrl"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "number"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "number"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "string"
+              ],
+              [
+                10,
+                "string"
+              ],
+              [
+                11,
+                "number"
+              ],
+              [
+                12,
+                "string"
+              ],
+              [
+                13,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                false
+              ],
+              [
+                1,
+                false
+              ],
+              [
+                2,
+                false
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                false
+              ],
+              [
+                6,
+                false
+              ],
+              [
+                7,
+                false
+              ],
+              [
+                8,
+                false
+              ],
+              [
+                9,
+                false
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                false
+              ],
+              [
+                12,
+                true
+              ],
+              [
+                13,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                13,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "csv",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 8,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "MlsId",
+            "ImageUrl"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "FirstTeam ES",
+          "database": "listings"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ]
+        }
+      }
+    }
+  }
+}

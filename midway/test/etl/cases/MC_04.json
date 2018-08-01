@@ -1,0 +1,676 @@
+{
+  "testName": "MC_04",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "ga:productSku": "KTAM-0001-COF",
+      "UniquePurchases": "21",
+      "ItemRevenue": "1259.79",
+      "ItemQuantity": "21",
+      "RevenuePerItem": "59.99",
+      "BuyToDetail": "4.4491525423728815"
+    },
+    {
+      "ga:productSku": "KTAM-0003-JER",
+      "UniquePurchases": "331",
+      "ItemRevenue": "18201.69",
+      "ItemQuantity": "331",
+      "RevenuePerItem": "54.99",
+      "BuyToDetail": "7.478535924084953"
+    },
+    {
+      "ga:productSku": "KTAM-0004-SUR",
+      "UniquePurchases": "46",
+      "ItemRevenue": "3449.54",
+      "ItemQuantity": "46",
+      "RevenuePerItem": "74.99",
+      "BuyToDetail": "2.2126022126022127"
+    },
+    {
+      "ga:productSku": "KTAM-0006-CHU",
+      "UniquePurchases": "37",
+      "ItemRevenue": "4439.63",
+      "ItemQuantity": "37",
+      "RevenuePerItem": "119.99",
+      "BuyToDetail": "2.1142857142857143"
+    },
+    {
+      "ga:productSku": "KTAM-0007-BAR",
+      "UniquePurchases": "275",
+      "ItemRevenue": "17872.25",
+      "ItemQuantity": "275",
+      "RevenuePerItem": "64.99",
+      "BuyToDetail": "5.595116988809766"
+    },
+    {
+      "ga:productSku": "KTAM-0008-BRR",
+      "UniquePurchases": "39",
+      "ItemRevenue": "2144.61",
+      "ItemQuantity": "39",
+      "RevenuePerItem": "54.99",
+      "BuyToDetail": "2.9885057471264367"
+    },
+    {
+      "ga:productSku": "KTBG-0002-DAD",
+      "UniquePurchases": "62",
+      "ItemRevenue": "6199.38",
+      "ItemQuantity": "62",
+      "RevenuePerItem": "99.99",
+      "BuyToDetail": "1.985270573166827"
+    },
+    {
+      "ga:productSku": "KTBR-0001-MAN",
+      "UniquePurchases": "113",
+      "ItemRevenue": "8473.87",
+      "ItemQuantity": "113",
+      "RevenuePerItem": "74.99",
+      "BuyToDetail": "4.213273676360925"
+    },
+    {
+      "ga:productSku": "KTBR-0002-MAN",
+      "UniquePurchases": "77",
+      "ItemRevenue": "9624.23",
+      "ItemQuantity": "77",
+      "RevenuePerItem": "124.99",
+      "BuyToDetail": "9.112426035502958"
+    },
+    {
+      "ga:productSku": "KTBR-0003-MAN",
+      "UniquePurchases": "49",
+      "ItemRevenue": "8574.51",
+      "ItemQuantity": "49",
+      "RevenuePerItem": "174.99",
+      "BuyToDetail": "2.2032374100719423"
+    }
+  ],
+  "outputDocs": [
+    {
+      "SKU": "KTAM-0001-COF",
+      "UniquePurchases": 21,
+      "ProductRevenue": 1259.79,
+      "Quantity": 21,
+      "AveragePrice": 59.99,
+      "ConversionRate": 4.4491525423728815
+    },
+    {
+      "SKU": "KTAM-0003-JER",
+      "UniquePurchases": 331,
+      "ProductRevenue": 18201.69,
+      "Quantity": 331,
+      "AveragePrice": 54.99,
+      "ConversionRate": 7.478535924084953
+    },
+    {
+      "SKU": "KTAM-0004-SUR",
+      "UniquePurchases": 46,
+      "ProductRevenue": 3449.54,
+      "Quantity": 46,
+      "AveragePrice": 74.99,
+      "ConversionRate": 2.2126022126022127
+    },
+    {
+      "SKU": "KTAM-0006-CHU",
+      "UniquePurchases": 37,
+      "ProductRevenue": 4439.63,
+      "Quantity": 37,
+      "AveragePrice": 119.99,
+      "ConversionRate": 2.1142857142857143
+    },
+    {
+      "SKU": "KTAM-0007-BAR",
+      "UniquePurchases": 275,
+      "ProductRevenue": 17872.25,
+      "Quantity": 275,
+      "AveragePrice": 64.99,
+      "ConversionRate": 5.595116988809766
+    },
+    {
+      "SKU": "KTAM-0008-BRR",
+      "UniquePurchases": 39,
+      "ProductRevenue": 2144.61,
+      "Quantity": 39,
+      "AveragePrice": 54.99,
+      "ConversionRate": 2.9885057471264367
+    },
+    {
+      "SKU": "KTBG-0002-DAD",
+      "UniquePurchases": 62,
+      "ProductRevenue": 6199.38,
+      "Quantity": 62,
+      "AveragePrice": 99.99,
+      "ConversionRate": 1.985270573166827
+    },
+    {
+      "SKU": "KTBR-0001-MAN",
+      "UniquePurchases": 113,
+      "ProductRevenue": 8473.87,
+      "Quantity": 113,
+      "AveragePrice": 74.99,
+      "ConversionRate": 4.213273676360925
+    },
+    {
+      "SKU": "KTBR-0002-MAN",
+      "UniquePurchases": 77,
+      "ProductRevenue": 9624.23,
+      "Quantity": 77,
+      "AveragePrice": 124.99,
+      "ConversionRate": 9.112426035502958
+    },
+    {
+      "SKU": "KTBR-0003-MAN",
+      "UniquePurchases": 49,
+      "ProductRevenue": 8574.51,
+      "Quantity": 49,
+      "AveragePrice": 174.99,
+      "ConversionRate": 2.2032374100719423
+    }
+  ],
+  "template": {
+    "id": 4,
+    "lastModified": "2018-07-11T23:09:51.172Z",
+    "createdAt": "2018-05-25T22:38:20.690Z",
+    "archived": false,
+    "templateName": "Google Analytics Import Template",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "ga:productSku"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "ItemRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "ItemQuantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "RevenuePerItem"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "BuyToDetail"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "BuyToDetail"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "ItemRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "ItemQuantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "RevenuePerItem"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 6,
+            "uidNode": 11,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "ga:productSku"
+                ],
+                0
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                1
+              ],
+              [
+                [
+                  "ItemRevenue"
+                ],
+                2
+              ],
+              [
+                [
+                  "ItemQuantity"
+                ],
+                3
+              ],
+              [
+                [
+                  "RevenuePerItem"
+                ],
+                4
+              ],
+              [
+                [
+                  "BuyToDetail"
+                ],
+                5
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "SKU"
+                ]
+              ],
+              [
+                1,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                2,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                3,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                4,
+                [
+                  "AveragePrice"
+                ]
+              ],
+              [
+                5,
+                [
+                  "ConversionRate"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "number"
+              ],
+              [
+                5,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "GoogleAnalytics",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "dayInterval": 30
+        },
+        "integrationId": 6,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "SKU",
+            "UniquePurchases",
+            "ProductRevenue",
+            "Quantity",
+            "AveragePrice",
+            "ConversionRate"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "Mancrates ES",
+          "database": "mancrates_products"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      }
+    }
+  }
+}

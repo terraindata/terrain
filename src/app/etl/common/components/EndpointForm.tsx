@@ -56,6 +56,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { EndpointTypeNames, SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { backgroundColor, Colors } from 'src/app/colors/Colors';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormLookups';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
@@ -218,28 +219,33 @@ class EndpointForm extends TerrainComponent<Props>
               onTextInputEnter={this.props.onSubmit}
             />
         }
-        { // integration form
-          isIntegrationType ?
-            <IntegrationPicker
-              integrationType={endpoint.type}
-              integrations={integrations}
-              selectedIntegration={usingCustomIntegration ? 'custom' : endpoint.integrationId}
-              onChange={this.handleIntegrationPickerChange}
-              createIntegration={this.createIntegration}
-            />
-            :
-            null
-        }
-        <FadeInOut
-          open={showIntegrationForm}
+        <div
+          className='endpoint-integration-block'
+          style={showIntegrationForm ? backgroundColor(Colors().bg2) : undefined}
         >
-          <IntegrationForm
-            integration={integrations.get(endpoint.integrationId)}
-            onChange={this.handleIntegrationChange}
-            hideType={true}
-            hideName={!usingCustomIntegration}
-          />
-        </FadeInOut>
+          { // integration form
+            isIntegrationType ?
+              <IntegrationPicker
+                integrationType={endpoint.type}
+                integrations={integrations}
+                selectedIntegration={usingCustomIntegration ? 'custom' : endpoint.integrationId}
+                onChange={this.handleIntegrationPickerChange}
+                createIntegration={this.createIntegration}
+              />
+              :
+              null
+          }
+          <FadeInOut
+            open={showIntegrationForm}
+          >
+            <IntegrationForm
+              integration={integrations.get(endpoint.integrationId)}
+              onChange={this.handleIntegrationChange}
+              hideType={true}
+              hideName={!usingCustomIntegration}
+            />
+          </FadeInOut>
+        </div>
         <FadeInOut
           open={showForm}
         >

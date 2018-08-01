@@ -1,0 +1,778 @@
+{
+  "testName": "MB_01",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "ga:productSku": "10002",
+      "UniquePurchases": "19",
+      "ProductRevenue": "1701.437692",
+      "Quantity": "25",
+      "AvgPrice": "68.05750768",
+      "UniquePageviews": "0",
+      "ConversionRate": "22.093023255813954"
+    },
+    {
+      "ga:productSku": "10003",
+      "UniquePurchases": "10",
+      "ProductRevenue": "568.665865",
+      "Quantity": "10",
+      "AvgPrice": "56.8665865",
+      "UniquePageviews": "0",
+      "ConversionRate": "166.66666666666669"
+    },
+    {
+      "ga:productSku": "10005",
+      "UniquePurchases": "19",
+      "ProductRevenue": "1613.037773",
+      "Quantity": "39",
+      "AvgPrice": "41.35994289743589",
+      "UniquePageviews": "0",
+      "ConversionRate": "29.6875"
+    },
+    {
+      "ga:productSku": "10006",
+      "UniquePurchases": "14",
+      "ProductRevenue": "572.624551",
+      "Quantity": "16",
+      "AvgPrice": "35.7890344375",
+      "UniquePageviews": "0",
+      "ConversionRate": "11.475409836065573"
+    },
+    {
+      "ga:productSku": "10008",
+      "UniquePurchases": "2",
+      "ProductRevenue": "77.736058",
+      "Quantity": "2",
+      "AvgPrice": "38.868029",
+      "UniquePageviews": "0",
+      "ConversionRate": "25.0"
+    },
+    {
+      "ga:productSku": "10009",
+      "UniquePurchases": "4",
+      "ProductRevenue": "336.030086",
+      "Quantity": "10",
+      "AvgPrice": "33.6030086",
+      "UniquePageviews": "0",
+      "ConversionRate": "66.66666666666666"
+    },
+    {
+      "ga:productSku": "10010",
+      "UniquePurchases": "2",
+      "ProductRevenue": "155.472115",
+      "Quantity": "4",
+      "AvgPrice": "38.86802875",
+      "UniquePageviews": "0",
+      "ConversionRate": "100.0"
+    },
+    {
+      "ga:productSku": "10011",
+      "UniquePurchases": "4",
+      "ProductRevenue": "262.366484",
+      "Quantity": "6",
+      "AvgPrice": "43.72774733333333",
+      "UniquePageviews": "0",
+      "ConversionRate": "0.0"
+    },
+    {
+      "ga:productSku": "10012",
+      "UniquePurchases": "52",
+      "ProductRevenue": "6563.911046",
+      "Quantity": "124",
+      "AvgPrice": "52.9347665",
+      "UniquePageviews": "0",
+      "ConversionRate": "13.436692506459949"
+    },
+    {
+      "ga:productSku": "10013",
+      "UniquePurchases": "16",
+      "ProductRevenue": "2296.709742",
+      "Quantity": "60",
+      "AvgPrice": "38.2784957",
+      "UniquePageviews": "0",
+      "ConversionRate": "4.31266846361186"
+    }
+  ],
+  "outputDocs": [
+    {
+      "id": "gmc01-10002",
+      "ConversionRate": 22.093023255813954,
+      "UniquePurchases": 19,
+      "ProductRevenue": 1701.437692,
+      "Quantity": 25,
+      "AvgPrice": 68.05750768,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10003",
+      "ConversionRate": 166.66666666666669,
+      "UniquePurchases": 10,
+      "ProductRevenue": 568.665865,
+      "Quantity": 10,
+      "AvgPrice": 56.8665865,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10005",
+      "ConversionRate": 29.6875,
+      "UniquePurchases": 19,
+      "ProductRevenue": 1613.037773,
+      "Quantity": 39,
+      "AvgPrice": 41.35994289743589,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10006",
+      "ConversionRate": 11.475409836065573,
+      "UniquePurchases": 14,
+      "ProductRevenue": 572.624551,
+      "Quantity": 16,
+      "AvgPrice": 35.7890344375,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10008",
+      "ConversionRate": 25,
+      "UniquePurchases": 2,
+      "ProductRevenue": 77.736058,
+      "Quantity": 2,
+      "AvgPrice": 38.868029,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10009",
+      "ConversionRate": 66.66666666666666,
+      "UniquePurchases": 4,
+      "ProductRevenue": 336.030086,
+      "Quantity": 10,
+      "AvgPrice": 33.6030086,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10010",
+      "ConversionRate": 100,
+      "UniquePurchases": 2,
+      "ProductRevenue": 155.472115,
+      "Quantity": 4,
+      "AvgPrice": 38.86802875,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10011",
+      "ConversionRate": 0,
+      "UniquePurchases": 4,
+      "ProductRevenue": 262.366484,
+      "Quantity": 6,
+      "AvgPrice": 43.72774733333333,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10012",
+      "ConversionRate": 13.436692506459949,
+      "UniquePurchases": 52,
+      "ProductRevenue": 6563.911046,
+      "Quantity": 124,
+      "AvgPrice": 52.9347665,
+      "UniquePageviews": 0
+    },
+    {
+      "id": "gmc01-10013",
+      "ConversionRate": 4.31266846361186,
+      "UniquePurchases": 16,
+      "ProductRevenue": 2296.709742,
+      "Quantity": 60,
+      "AvgPrice": 38.2784957,
+      "UniquePageviews": 0
+    }
+  ],
+  "template": {
+    "id": 3,
+    "lastModified": "2018-07-12T15:56:38.365Z",
+    "createdAt": "2018-05-25T17:51:26.601Z",
+    "archived": false,
+    "templateName": "Google Analytics Import",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "ga:productSku"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "AvgPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "UniquePageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "ConversionRate"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "UniquePurchases"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "ProductRevenue"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "Quantity"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "AvgPrice"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "UniquePageviews"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "13",
+                  "value": {
+                    "id": 13,
+                    "fields": [
+                      [
+                        "ga:productSku"
+                      ]
+                    ],
+                    "meta": {
+                      "value": "gmc01-",
+                      "at": 0
+                    },
+                    "skipNulls": true,
+                    "typeCode": "InsertNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 7,
+            "uidNode": 14,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "ga:productSku"
+                ],
+                0
+              ],
+              [
+                [
+                  "ConversionRate"
+                ],
+                1
+              ],
+              [
+                [
+                  "UniquePurchases"
+                ],
+                2
+              ],
+              [
+                [
+                  "ProductRevenue"
+                ],
+                3
+              ],
+              [
+                [
+                  "Quantity"
+                ],
+                4
+              ],
+              [
+                [
+                  "AvgPrice"
+                ],
+                5
+              ],
+              [
+                [
+                  "UniquePageviews"
+                ],
+                6
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "id"
+                ]
+              ],
+              [
+                1,
+                [
+                  "ConversionRate"
+                ]
+              ],
+              [
+                2,
+                [
+                  "UniquePurchases"
+                ]
+              ],
+              [
+                3,
+                [
+                  "ProductRevenue"
+                ]
+              ],
+              [
+                4,
+                [
+                  "Quantity"
+                ]
+              ],
+              [
+                5,
+                [
+                  "AvgPrice"
+                ]
+              ],
+              [
+                6,
+                [
+                  "UniquePageviews"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "string"
+              ],
+              [
+                1,
+                "number"
+              ],
+              [
+                2,
+                "number"
+              ],
+              [
+                3,
+                "number"
+              ],
+              [
+                4,
+                "number"
+              ],
+              [
+                5,
+                "number"
+              ],
+              [
+                6,
+                "number"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                true
+              ],
+              [
+                4,
+                true
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "Number",
+                  "elastic": {
+                    "isPrimaryKey": false,
+                    "elasticType": "auto"
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "GoogleAnalytics",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "dayInterval": 30
+        },
+        "integrationId": 3,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "id",
+            "ConversionRate",
+            "UniquePurchases",
+            "ProductRevenue",
+            "Quantity",
+            "AvgPrice",
+            "UniquePageviews"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "language": "elastic",
+          "table": "data",
+          "serverId": "Mixbook ES ",
+          "database": "mixbook_products"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      }
+    }
+  }
+}

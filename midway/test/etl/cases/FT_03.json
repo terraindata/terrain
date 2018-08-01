@@ -1,0 +1,1011 @@
+{
+  "testName": "FT_03",
+  "numDocs": 10,
+  "numFailed": 0,
+  "whichEdge": 0,
+  "inputDocs": [
+    {
+      "id": 15195,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "mikecatron011@gmail.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15194,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "rhonda.watson@amaisd.org",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15193,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "jhermiz@cs.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15192,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "kelmanz2003@yahoo.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15191,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "dwewmom@yahoo.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15190,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "super_q@hotmail.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15189,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "1foxxyroxxy2@gmail.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15188,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "abbeuy.price@hotmail.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15187,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "apple219@live.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    },
+    {
+      "id": 15186,
+      "tags": [
+        "terrain"
+      ],
+      "emails": [
+        {
+          "value": "franklinperry56@yahoo.com",
+          "type": "home",
+          "is_primary": "1",
+          "isPrimary": "1"
+        }
+      ]
+    }
+  ],
+  "outputDocs": [
+    {
+      "FollowUpBossId": 15195,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15194,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15193,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15192,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15191,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15190,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15189,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15188,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15187,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    },
+    {
+      "FollowUpBossId": 15186,
+      "tags": [
+        "terrain"
+      ],
+      "Email": "********"
+    }
+  ],
+  "template": {
+    "id": 30,
+    "lastModified": "2018-07-10T00:29:19.601Z",
+    "createdAt": "2018-06-21T17:55:30.067Z",
+    "archived": false,
+    "templateName": "Users - FUB Import 100-200",
+    "process": {
+      "nodes": {
+        "0": {
+          "id": 0,
+          "type": "Source",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        },
+        "1": {
+          "id": 1,
+          "type": "Sink",
+          "options": {
+            "leftId": -1,
+            "rightId": -1,
+            "leftJoinKey": "",
+            "rightJoinKey": "",
+            "outputKey": ""
+          },
+          "endpoint": "_default"
+        }
+      },
+      "edges": {
+        "0": {
+          "id": 0,
+          "from": 0,
+          "to": 1,
+          "transformations": {
+            "dag": {
+              "options": {
+                "directed": true,
+                "multigraph": false,
+                "compound": false
+              },
+              "nodes": [
+                {
+                  "v": "0",
+                  "value": {
+                    "id": 0,
+                    "fields": [
+                      [
+                        "id"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "number"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "1",
+                  "value": {
+                    "id": 1,
+                    "fields": [
+                      [
+                        "tags"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "2",
+                  "value": {
+                    "id": 2,
+                    "fields": [
+                      [
+                        "tags",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "3",
+                  "value": {
+                    "id": 3,
+                    "fields": [
+                      [
+                        "emails"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "array"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "4",
+                  "value": {
+                    "id": 4,
+                    "fields": [
+                      [
+                        "emails",
+                        -1
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "object"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "5",
+                  "value": {
+                    "id": 5,
+                    "fields": [
+                      [
+                        "emails",
+                        -1,
+                        "value"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "6",
+                  "value": {
+                    "id": 6,
+                    "fields": [
+                      [
+                        "emails",
+                        -1,
+                        "type"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "7",
+                  "value": {
+                    "id": 7,
+                    "fields": [
+                      [
+                        "emails",
+                        -1,
+                        "is_primary"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "8",
+                  "value": {
+                    "id": 8,
+                    "fields": [
+                      [
+                        "emails",
+                        -1,
+                        "isPrimary"
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "9",
+                  "value": {
+                    "id": 9,
+                    "fields": [
+                      [
+                        "emails",
+                        -1,
+                        "value"
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "Emails"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "10",
+                  "value": {
+                    "id": 10,
+                    "fields": [
+                      [
+                        "Emails",
+                        0
+                      ]
+                    ],
+                    "meta": {
+                      "toTypename": "string"
+                    },
+                    "skipNulls": false,
+                    "typeCode": "CastNode"
+                  }
+                },
+                {
+                  "v": "11",
+                  "value": {
+                    "id": 11,
+                    "fields": [
+                      [
+                        "Emails",
+                        0
+                      ]
+                    ],
+                    "meta": {
+                      "newFieldKeyPaths": [
+                        [
+                          "Email"
+                        ]
+                      ]
+                    },
+                    "typeCode": "DuplicateNode"
+                  }
+                },
+                {
+                  "v": "12",
+                  "value": {
+                    "id": 12,
+                    "fields": [
+                      [
+                        "_synthetic_xsjs12ejqta",
+                        "Email"
+                      ]
+                    ],
+                    "meta": {},
+                    "skipNulls": true,
+                    "typeCode": "EncryptNode",
+                    "acceptedType": "string"
+                  }
+                }
+              ],
+              "edges": []
+            },
+            "doc": {},
+            "uidField": 13,
+            "uidNode": 13,
+            "fieldNameToIDMap": [
+              [
+                [
+                  "emails",
+                  -1,
+                  "value"
+                ],
+                5
+              ],
+              [
+                [
+                  "emails",
+                  -1,
+                  "type"
+                ],
+                6
+              ],
+              [
+                [
+                  "emails",
+                  -1
+                ],
+                4
+              ],
+              [
+                [
+                  "Emails",
+                  0
+                ],
+                11
+              ],
+              [
+                [
+                  "_synthetic_xsjs12ejqta",
+                  "Email"
+                ],
+                12
+              ],
+              [
+                [
+                  "emails",
+                  -1,
+                  "is_primary"
+                ],
+                7
+              ],
+              [
+                [
+                  "id"
+                ],
+                0
+              ],
+              [
+                [
+                  "Emails",
+                  -1
+                ],
+                10
+              ],
+              [
+                [
+                  "emails",
+                  -1,
+                  "isPrimary"
+                ],
+                8
+              ],
+              [
+                [
+                  "tags",
+                  -1
+                ],
+                2
+              ],
+              [
+                [
+                  "_synthetic_nv2a6we0fze",
+                  "Emails"
+                ],
+                9
+              ],
+              [
+                [
+                  "tags"
+                ],
+                1
+              ],
+              [
+                [
+                  "emails"
+                ],
+                3
+              ]
+            ],
+            "IDToFieldNameMap": [
+              [
+                0,
+                [
+                  "FollowUpBossId"
+                ]
+              ],
+              [
+                1,
+                [
+                  "tags"
+                ]
+              ],
+              [
+                2,
+                [
+                  "tags",
+                  -1
+                ]
+              ],
+              [
+                3,
+                [
+                  "emails"
+                ]
+              ],
+              [
+                4,
+                [
+                  "emails",
+                  -1
+                ]
+              ],
+              [
+                5,
+                [
+                  "emails",
+                  -1,
+                  "value"
+                ]
+              ],
+              [
+                6,
+                [
+                  "emails",
+                  -1,
+                  "type"
+                ]
+              ],
+              [
+                7,
+                [
+                  "emails",
+                  -1,
+                  "is_primary"
+                ]
+              ],
+              [
+                8,
+                [
+                  "emails",
+                  -1,
+                  "isPrimary"
+                ]
+              ],
+              [
+                9,
+                [
+                  "Emails"
+                ]
+              ],
+              [
+                10,
+                [
+                  "Emails",
+                  -1
+                ]
+              ],
+              [
+                11,
+                [
+                  "Emails",
+                  0
+                ]
+              ],
+              [
+                12,
+                [
+                  "Email"
+                ]
+              ]
+            ],
+            "fieldTypes": [
+              [
+                0,
+                "number"
+              ],
+              [
+                1,
+                "array"
+              ],
+              [
+                2,
+                "array"
+              ],
+              [
+                3,
+                "array"
+              ],
+              [
+                4,
+                "array"
+              ],
+              [
+                5,
+                "string"
+              ],
+              [
+                6,
+                "string"
+              ],
+              [
+                7,
+                "string"
+              ],
+              [
+                8,
+                "string"
+              ],
+              [
+                9,
+                "array"
+              ],
+              [
+                10,
+                "array"
+              ],
+              [
+                11,
+                "string"
+              ],
+              [
+                12,
+                "string"
+              ]
+            ],
+            "fieldEnabled": [
+              [
+                0,
+                true
+              ],
+              [
+                1,
+                true
+              ],
+              [
+                2,
+                true
+              ],
+              [
+                3,
+                false
+              ],
+              [
+                4,
+                false
+              ],
+              [
+                5,
+                true
+              ],
+              [
+                6,
+                true
+              ],
+              [
+                7,
+                true
+              ],
+              [
+                8,
+                true
+              ],
+              [
+                9,
+                false
+              ],
+              [
+                10,
+                false
+              ],
+              [
+                11,
+                true
+              ],
+              [
+                12,
+                true
+              ]
+            ],
+            "fieldProps": [
+              [
+                0,
+                {
+                  "etlType": "Integer",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                1,
+                {
+                  "valueType": "string",
+                  "etlType": "Array",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                2,
+                {
+                  "valueType": "string",
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                3,
+                {
+                  "valueType": "object",
+                  "etlType": "Array",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                4,
+                {
+                  "valueType": "object",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                5,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                6,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                7,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                8,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                9,
+                {
+                  "etlType": "Array",
+                  "valueType": "string",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                10,
+                {
+                  "etlType": "String",
+                  "valueType": "string",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                11,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": false
+                  }
+                }
+              ],
+              [
+                12,
+                {
+                  "etlType": "String",
+                  "elastic": {
+                    "isPrimaryKey": true
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "uidNode": 2,
+      "uidEdge": 1
+    },
+    "sources": {
+      "_default": {
+        "type": "Http",
+        "name": "Default Source",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": "people.*",
+          "fieldOrdering": null,
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "method": "GET"
+        },
+        "integrationId": 9,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "sinks": {
+      "_default": {
+        "type": "Database",
+        "name": "Default Sink",
+        "fileConfig": {
+          "fileType": "json",
+          "hasCsvHeader": true,
+          "jsonNewlines": false,
+          "xmlPath": null,
+          "jsonPath": null,
+          "fieldOrdering": [
+            "FollowUpBossId",
+            "tags",
+            "Email"
+          ],
+          "isPlaFeed": false,
+          "ignoreQuotes": false
+        },
+        "options": {
+          "serverId": "FirstTeam ES",
+          "database": "users",
+          "table": "data",
+          "language": "elastic"
+        },
+        "integrationId": -1,
+        "rootInputConfig": {
+          "inputs": null
+        },
+        "rootPostProcessConfig": {
+          "transformations": null
+        }
+      }
+    },
+    "settings": {
+      "abortThreshold": 0
+    },
+    "meta": {
+      "version": "tv5"
+    },
+    "uiData": {
+      "engineFieldOrders": {
+        "0": {
+          "ordering": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            9,
+            12,
+            6,
+            7,
+            8,
+            10,
+            11
+          ]
+        }
+      }
+    }
+  }
+}

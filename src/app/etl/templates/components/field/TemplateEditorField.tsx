@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
+import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ComponentUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/EngineProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
@@ -111,7 +111,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     // check if this field no longer exists
     const currentEngine = getCurrentEngine(nextProps);
-    if (currentEngine == null || currentEngine.getOutputKeyPath(nextProps.fieldId) === undefined)
+    if (currentEngine == null)
+    {
+      return false;
+    }
+    if (this._fieldMap(nextProps) == null || this._field(nextProps.fieldId, nextProps) == null)
     {
       return false;
     }
@@ -237,13 +241,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _isRootField()
   {
     const { fieldId } = this.props;
-    const kp = this._field().outputKeyPath;
+    const kp = this._field().fieldPath;
     return kp.size === 1;
   }
 
   protected _fieldDepth(props = this.props)
   {
-    return this._field(props.fieldId, props).outputKeyPath.size;
+    return this._field(props.fieldId, props).fieldPath.size;
   }
 
   protected _getCurrentLanguage(props = this.props): Languages

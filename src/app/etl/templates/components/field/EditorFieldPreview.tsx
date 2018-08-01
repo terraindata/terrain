@@ -46,22 +46,24 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldVerification } from 'shared/etl/languages/LanguageControllers';
 import LanguageController from 'shared/etl/languages/LanguageControllers';
-import { ETLFieldTypes } from 'shared/etl/types/ETLTypes';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import * as Utils from 'shared/transformations/util/EngineUtils';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -101,7 +103,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.openSettings,
       });
     }
-    if (field.etlType === ETLFieldTypes.Object)
+    if (field.etlType === FieldTypes.Object)
     {
       options.push({
         text: 'Add a subfield',
@@ -114,10 +116,10 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         text: 'Move this Field',
         onClick: this.requestMoveField,
       });
-      options.push({
-        text: 'Delete this Field',
-        onClick: this.requestDeleteField,
-      });
+      // options.push({
+      //   text: 'Delete this Field',
+      //   onClick: this.requestDeleteField,
+      // });
     }
     if (!field.isNamedField())
     {
@@ -175,8 +177,8 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     const field = this._field();
 
     const hidePreviewValue =
-      field.etlType === ETLFieldTypes.Array ||
-      field.etlType === ETLFieldTypes.Object ||
+      field.etlType === FieldTypes.Array ||
+      field.etlType === FieldTypes.Object ||
       labelOnly;
 
     if (hidePreviewValue)
@@ -188,7 +190,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       let previewText: string;
       switch (field.etlType)
       {
-        case ETLFieldTypes.GeoPoint:
+        case FieldTypes.GeoPoint:
           if (preview == null)
           {
             previewText = 'N/A';
@@ -385,31 +387,31 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
-  public deleteThisField()
-  {
-    this._try((proxy) =>
-    {
-      proxy.deleteField(this.props.fieldId);
-    });
-  }
+  // public deleteThisField()
+  // {
+  //   this._try((proxy) =>
+  //   {
+  //     proxy.deleteField(this.props.fieldId);
+  //   });
+  // }
 
-  public requestDeleteField()
-  {
-    let message = 'Are you sure you want to delete this field?';
-    if (this._field().childrenIds.size > 0)
-    {
-      message = 'Deleting this field will remove all child fields. ' + message;
-    }
-    this.props.act({
-      actionType: 'addModal',
-      props: {
-        title: 'Confirm Action',
-        message,
-        confirm: true,
-        onConfirm: this.deleteThisField.bind(this),
-      },
-    });
-  }
+  // public requestDeleteField()
+  // {
+  //   let message = 'Are you sure you want to delete this field?';
+  //   if (this._field().childrenIds.size > 0)
+  //   {
+  //     message = 'Deleting this field will remove all child fields. ' + message;
+  //   }
+  //   this.props.act({
+  //     actionType: 'addModal',
+  //     props: {
+  //       title: 'Confirm Action',
+  //       message,
+  //       confirm: true,
+  //       onConfirm: this.deleteThisField.bind(this),
+  //     },
+  //   });
+  // }
 
   public requestAddField()
   {
@@ -474,7 +476,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   private renderTypeIcon()
   {
-    const type = EngineUtil.getETLFieldType(this.props.fieldId, this._currentEngine());
+    const type = Utils.fields.fieldType(this.props.fieldId, this._currentEngine());
     const Icon = typeToIcon[type];
     return (
       <div
@@ -496,17 +498,17 @@ const GeoTypeIcon = require('./../../../../../images/icon_type_geo.svg?name=GeoT
 const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?name=BooleanTypeIcon');
 
 const typeToIcon: {
-  [k in ETLFieldTypes]: any;
+  [k in FieldTypes]: any;
 } = {
-  [ETLFieldTypes.String]: TextTypeIcon,
-  [ETLFieldTypes.Object]: ObjectTypeIcon,
-  [ETLFieldTypes.Number]: NumberTypeIcon,
-  [ETLFieldTypes.Integer]: NumberTypeIcon,
-  [ETLFieldTypes.Boolean]: BooleanTypeIcon,
-  [ETLFieldTypes.Array]: ArrayTypeIcon,
-  [ETLFieldTypes.Date]: DateTypeIcon,
-  [ETLFieldTypes.GeoPoint]: GeoTypeIcon,
-};
+    [FieldTypes.String]: TextTypeIcon,
+    [FieldTypes.Object]: ObjectTypeIcon,
+    [FieldTypes.Number]: NumberTypeIcon,
+    [FieldTypes.Integer]: NumberTypeIcon,
+    [FieldTypes.Boolean]: BooleanTypeIcon,
+    [FieldTypes.Array]: ArrayTypeIcon,
+    [FieldTypes.Date]: DateTypeIcon,
+    [FieldTypes.GeoPoint]: GeoTypeIcon,
+  };
 
 const emptyOptions = List([]);
 

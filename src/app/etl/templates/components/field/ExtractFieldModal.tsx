@@ -45,24 +45,32 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file
 
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+const { List, Map } = Immutable;
 
+import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Modal from 'common/components/Modal';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
-import { validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+import * as Utils from 'shared/transformations/util/EngineUtils';
 
 import './EditorFieldModal.less';
 
@@ -206,7 +214,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
     {
       const { templateEditor } = this.props;
       const engine = templateEditor.getCurrentEngine();
-      const okp = engine.getOutputKeyPath(fieldId);
+      const okp = engine.getFieldPath(fieldId);
 
       if (okp === undefined)
       {
@@ -214,7 +222,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       }
       else
       {
-        const lastIndex = okp.findLastIndex((val, i) => EngineUtil.isNamedField(okp, i));
+        const lastIndex = okp.findLastIndex((val, i) => Utils.path.isNamed(okp, i));
         if (lastIndex === -1)
         {
           return List([name]);
@@ -258,7 +266,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
         };
       }
     }
-    return validateNewFieldName(engine, -1, keypath);
+    return Utils.validation.canAddField(engine, -1, keypath);
   }
 
   public validateState(): { isValid: boolean, message: string }

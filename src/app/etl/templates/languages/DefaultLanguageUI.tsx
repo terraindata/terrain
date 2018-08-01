@@ -44,9 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
+import * as React from 'react';
 import { Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+import { TemplateEditorFieldProps } from 'etl/templates/components/field/TemplateEditorField';
 import { LanguageInterface } from 'etl/templates/languages/LanguageUI';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 export class DefaultUI implements LanguageInterface
 {
