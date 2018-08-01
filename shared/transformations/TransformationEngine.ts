@@ -427,7 +427,11 @@ export class TransformationEngine
         this.dag.setEdge(inEdges[0].v, outEdges[0].w);
       } // else not supported yet
     }
-
+    const execIndex = this.executionOrder.indexOf(transformationID);
+    if (execIndex !== -1)
+    {
+      this.executionOrder = this.executionOrder.splice(execIndex, 1);
+    }
     this.dag.removeNode(transformationID.toString());
   }
 
