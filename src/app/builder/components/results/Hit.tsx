@@ -325,6 +325,39 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
+  public onVideoHoverStart(e)
+  {
+    const video: HTMLVideoElement = document.getElementsByClassName(e.target.className)[0] as HTMLVideoElement;
+    if (video.paused)
+    {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.then( () => { } ).catch( () => { } );
+      }
+    }
+  }
+
+  public onVideoHoverStop(e)
+  {
+    const video: HTMLVideoElement = document.getElementsByClassName(e.target.className)[0] as HTMLVideoElement;
+    if (!video.paused)
+    {
+      video.pause();
+    }
+  }
+
+  public onYoutubeVideoHoverStart(e)
+  {
+    const video: HTMLMediaElement = document.getElementsByClassName(e.target.className)[0] as HTMLMediaElement;
+    video.src = e.target.className.replace('watch?v=', 'embed/').concat('?autoplay=1&mute=1&loop=1');
+  }
+
+  public onYoutubeVideoHoverStop(e)
+  {
+    const video: HTMLMediaElement = document.getElementsByClassName(e.target.className)[0] as HTMLMediaElement;
+    video.src = e.target.className.replace('watch?v=', 'embed/');
+  }
+
   public renderNestedItems(items, format, field, depth, offset)
   {
     return (
@@ -725,64 +758,102 @@ class HitComponent extends TerrainComponent<Props> {
           ]}
           onDoubleClick={this.expand}
         >
+         {
+          thumbnail &&
+          [
+          <div className={classNames({
+            'result-thumbnail-wrapper': true,
+            'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+          })}
+          style={{
+            width: thumbnailWidth,
+            minWidth: thumbnailWidth,
+            backgroundImage: `url(${thumbnail})`,
+          }}
+          key={1}>
           {
-            thumbnail &&
-            [
-              <div className={classNames({
-                'result-thumbnail-wrapper': true,
-                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
-              })}
-                style={{
-                  width: thumbnailWidth,
-                  minWidth: thumbnailWidth,
-                  backgroundImage: `url(${thumbnail})`,
-                }}
-                key={1}
-              >
-                {
-                  (thumbnail.includes('gifv'))
-                    ?
-                    <video controls src={thumbnail.replace('gifv', 'webm')} style={{
-                      width: thumbnailWidth,
-                      minWidth: thumbnailWidth,
-                    }}> </video>
-                    :
-                    (thumbnail.includes('youtube'))
-                      ?
-                      <iframe src={thumbnail.replace('watch?v=', 'embed/')} style={{
-                        width: thumbnailWidth,
-                        minWidth: thumbnailWidth                      
-}} allowfullscreen>
-                      </iframe>
-                      :
-                      (thumbnail.includes('mp4') || thumbnail.includes('webm'))
-                        ?
-                        <video controls src={thumbnail} style={{
-                          width: thumbnailWidth,
-                          minWidth: thumbnailWidth,
-                        }} > </video>
-                        :
-                        null
-                }
-              </div>
-              ,
-              this.state.hovered &&
-              <Draggable
-                axis='x'
-                bounds='parent'
-                position={{
-                  x: thumbnailWidth - 15,
-                  y: 0,
-                }}
-                onDrag={this.handleThumbnailResize}
-                key={2}
-              >
-                <div
-                  className='result-thumbnail-resizer'
-                />
-              </Draggable>,
-            ]
-          }
+          (thumbnail.includes('imgur') && !thumbnail.includes('gif'))
+          ?
+          <video className={thumbnail} src={thumbnail.concat('.webm')}
+          onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+          style={{
+            width: thumbnailWidth,
+            minWidth: thumbnailWidth,
+            position: 'relative',
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}> </video>
+          :
+          (thumbnail.includes('gifv'))
+          ?
+          <video className={thumbnail} src={thumbnail.replace('gifv', 'webm')}
+          onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+          style={{
+            width: thumbnailWidth,
+            minWidth: thumbnailWidth,
+            position: 'relative',
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}> </video>
+          :
+          (thumbnail.includes('youtube'))
+          ?
+          <iframe className={thumbnail} src={thumbnail.replace('watch?v=', 'embed/')} onMouseOver={this.onYoutubeVideoHoverStart}
+          onMouseOut={this.onYoutubeVideoHoverStop}
+          style={{
+            width: thumbnailWidth,
+            minWidth: thumbnailWidth,
+            position: 'relative',
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}>
+          </iframe>
+          :
+          (thumbnail.includes('vimeo'))
+          ?
+          <iframe className={thumbnail} src={thumbnail.replace('vimeo.com', 'player.vimeo.com/video')}
+          style={{
+            width: thumbnailWidth,
+            minWidth: thumbnailWidth,
+            position: 'relative',
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}>
+          </iframe>
+          :
+          (thumbnail.includes('mp4') || thumbnail.includes('webm'))
+          ?
+          <video className={thumbnail} src={thumbnail}
+          onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+          style={{
+            width: thumbnailWidth,
+            minWidth: thumbnailWidth,
+            position: 'relative',
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}> </video>
+          :
+          null
+        }
+          </div>
+          ,
+          this.state.hovered &&
+          <Draggable
+          axis='x'
+          bounds='parent'
+          position={{
+            x: thumbnailWidth - 15,
+            y: 0,
+          }}
+          onDrag={this.handleThumbnailResize}
+          key={2}
+          >
+          <div
+          className='result-thumbnail-resizer'
+          />
+          </Draggable>,
+          ]
+        }
           <div
             className={classNames({
               'result-details-wrapper': true,

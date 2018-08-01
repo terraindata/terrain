@@ -60,6 +60,7 @@ export interface SpotlightActionTypes
     actionType: 'spotlightAction',
     id: string,
     hit: any,
+    parentHit?: any,
   };
   clearSpotlightAction: {
     actionType: 'clearSpotlightAction',
