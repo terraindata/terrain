@@ -49,7 +49,7 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
-import LanguageController from 'shared/etl/languages/LanguageControllers';
+import LanguageController, { AllLanguages } from 'shared/etl/languages/LanguageControllers';
 import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import FriendEngine from 'shared/transformations/FriendEngine';
@@ -174,10 +174,10 @@ export default class FieldUtil
 
   public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
   {
-    LanguageController.get(Languages.Elastic)
-      .changeFieldTypeSideEffects(engine, fieldId, newType);
-    LanguageController.get(Languages.JavaScript)
-      .changeFieldTypeSideEffects(engine, fieldId, newType);
+    for (const language of AllLanguages)
+    {
+      LanguageController.get(language).changeFieldTypeSideEffects(engine, fieldId, newType);
+    }
   }
 
   public static copyField(e1: TransformationEngine, id1: number, keypath: KeyPath, node?: number, e2 = e1)
@@ -198,6 +198,14 @@ export default class FieldUtil
     else
     {
       e2.disableField(id2);
+    }
+
+    if (e1 === e2)
+    {
+      for (const language of AllLanguages)
+      {
+        LanguageController.get(language).copyFieldInfoSideEffects(e1, id2, id1);
+      }
     }
   }
 }

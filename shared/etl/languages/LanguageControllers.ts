@@ -61,6 +61,8 @@ export interface FieldVerification
   type: 'warning' | 'error';
 }
 
+export const AllLanguages = [Languages.JavaScript, Languages.Elastic];
+
 export interface LanguageInterface
 {
   language: Languages;
@@ -72,6 +74,8 @@ export interface LanguageInterface
   setFieldPrimaryKey: (engine: TransformationEngine, fieldId: number, value: boolean) => boolean;
   // if the field changes ETL types, take care of side effects
   changeFieldTypeSideEffects: (engine: TransformationEngine, fieldId: number, newType: FieldTypes) => boolean;
+  // if the field is copied from another, take care of side effects
+  copyFieldInfoSideEffects: (engine: TransformationEngine, fieldId: number, oldId: number) => boolean;
   // verify if the sink mapping is compatible. Returns an empty array if there are no issues
   verifyMapping: (engine: TransformationEngine, sink: SinkConfig, existingMapping?: object) => string[];
   // get potential issues for fields

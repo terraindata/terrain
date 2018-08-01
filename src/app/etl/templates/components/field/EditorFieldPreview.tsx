@@ -500,15 +500,15 @@ const BooleanTypeIcon = require('./../../../../../images/icon_type_boolean.svg?n
 const typeToIcon: {
   [k in FieldTypes]: any;
 } = {
-    [FieldTypes.String]: TextTypeIcon,
-    [FieldTypes.Object]: ObjectTypeIcon,
-    [FieldTypes.Number]: NumberTypeIcon,
-    [FieldTypes.Integer]: NumberTypeIcon,
-    [FieldTypes.Boolean]: BooleanTypeIcon,
-    [FieldTypes.Array]: ArrayTypeIcon,
-    [FieldTypes.Date]: DateTypeIcon,
-    [FieldTypes.GeoPoint]: GeoTypeIcon,
-  };
+  [FieldTypes.String]: TextTypeIcon,
+  [FieldTypes.Object]: ObjectTypeIcon,
+  [FieldTypes.Number]: NumberTypeIcon,
+  [FieldTypes.Integer]: NumberTypeIcon,
+  [FieldTypes.Boolean]: BooleanTypeIcon,
+  [FieldTypes.Array]: ArrayTypeIcon,
+  [FieldTypes.Date]: DateTypeIcon,
+  [FieldTypes.GeoPoint]: GeoTypeIcon,
+};
 
 const emptyOptions = List([]);
 

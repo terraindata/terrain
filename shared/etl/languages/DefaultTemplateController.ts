@@ -73,6 +73,11 @@ export class DefaultController implements LanguageInterface
     return false;
   }
 
+  public copyFieldInfoSideEffects(engine: TransformationEngine, fieldId: number, oldId: number)
+  {
+    return false;
+  }
+
   public verifyMapping(engine: TransformationEngine, sink, options?)
   {
     return [];

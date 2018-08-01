@@ -111,6 +111,21 @@ class ElasticController extends DefaultController implements LanguageInterface
         elasticType: ElasticTypes.Auto,
       });
       engine.setFieldProp(fieldId, List([this.language]), newProps);
+      return true;
+    }
+    return false;
+  }
+
+  public copyFieldInfoSideEffects(engine: TransformationEngine, fieldId: number, oldId: number)
+  {
+    const elasticProps = engine.getFieldProp(fieldId, List([this.language]));
+    if (elasticProps !== undefined)
+    {
+      const newProps = _.extend({}, elasticProps, {
+        isPrimaryKey: false,
+      });
+      engine.setFieldProp(fieldId, List([this.language]), newProps);
+      return true;
     }
     return false;
   }

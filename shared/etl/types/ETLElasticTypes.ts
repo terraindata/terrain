@@ -105,15 +105,15 @@ export function defaultProps(obj: Partial<ElasticFieldProps> = {}): ElasticField
 export const ETLToElasticOptions: {
   [k in FieldTypes]: ElasticTypes[]
 } = {
-    [FieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
-    [FieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
-    [FieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
-    [FieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
-    [FieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
-    [FieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
-    [FieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
-    [FieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
-  };
+  [FieldTypes.Array]: [ElasticTypes.Auto, ElasticTypes.Array],
+  [FieldTypes.Object]: [ElasticTypes.Auto, ElasticTypes.Nested],
+  [FieldTypes.String]: [ElasticTypes.Auto, ElasticTypes.Text],
+  [FieldTypes.Number]: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Float, ElasticTypes.HalfFloat],
+  [FieldTypes.Boolean]: [ElasticTypes.Auto, ElasticTypes.Boolean],
+  [FieldTypes.Date]: [ElasticTypes.Auto, ElasticTypes.Date],
+  [FieldTypes.Integer]: [ElasticTypes.Auto, ElasticTypes.Long, ElasticTypes.Integer, ElasticTypes.Short, ElasticTypes.Byte],
+  [FieldTypes.GeoPoint]: [ElasticTypes.Auto, ElasticTypes.GeoPoint],
+};
 
 function computeReverseElasticTypeMap()
 {
@@ -142,15 +142,15 @@ export const ElasticToETL = computeReverseElasticTypeMap();
 export const ETLTypeAutoMap: {
   [k in FieldTypes]: ElasticTypes
 } = {
-    [FieldTypes.Array]: ElasticTypes.Array,
-    [FieldTypes.Object]: ElasticTypes.Nested,
-    [FieldTypes.String]: ElasticTypes.Text,
-    [FieldTypes.Number]: ElasticTypes.Double,
-    [FieldTypes.Boolean]: ElasticTypes.Boolean,
-    [FieldTypes.Date]: ElasticTypes.Date,
-    [FieldTypes.Integer]: ElasticTypes.Long,
-    [FieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
-  };
+  [FieldTypes.Array]: ElasticTypes.Array,
+  [FieldTypes.Object]: ElasticTypes.Nested,
+  [FieldTypes.String]: ElasticTypes.Text,
+  [FieldTypes.Number]: ElasticTypes.Double,
+  [FieldTypes.Boolean]: ElasticTypes.Boolean,
+  [FieldTypes.Date]: ElasticTypes.Date,
+  [FieldTypes.Integer]: ElasticTypes.Long,
+  [FieldTypes.GeoPoint]: ElasticTypes.GeoPoint,
+};
 
 export function etlTypeToElastic(type: FieldTypes): ElasticTypes
 {
