@@ -61,6 +61,7 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import FloatingInput from 'common/components/FloatingInput';
 import Modal from 'common/components/Modal';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
@@ -75,6 +76,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
+const ErrorIcon = require('images/icon_info.svg');
 import './EditorFieldModal.less';
 
 interface Props
@@ -96,9 +98,9 @@ class MultiPromoteModal extends TerrainComponent<Props>
     checked: Immutable.Map<number, boolean>;
     renames: Immutable.Map<number, string>;
   } = {
-    checked: Map<number, boolean>(),
-    renames: Map<number, string>(),
-  };
+      checked: Map<number, boolean>(),
+      renames: Map<number, string>(),
+    };
 
   public componentWillReceiveProps(nextProps)
   {
@@ -115,6 +117,76 @@ class MultiPromoteModal extends TerrainComponent<Props>
     }
   }
 
+  // multi-layered cached function
+  @instanceFnDecorator(memoizeOne)
+  public _validationFactoryComputer(rootId: number, engine: TransformationEngine, engineVersion: number)
+    : (id: number) =>
+      ((name: string, renames: Immutable.Map<number, string>, checked: Immutable.Map<number, boolean>) =>
+        string)
+  {
+    const rootPath = engine.getFieldPath(rootId);
+    const nameValidatorFactory = (id: number) =>
+    {
+      const nameValidator = (name: string, renames: Immutable.Map<number, string>, checked: Immutable.Map<number, boolean>) =>
+      {
+        const thisPath = engine.getFieldPath(id);
+        const finalPath = thisPath.splice(rootPath.size - 1, 1).toList().set(rootPath.size - 1, name);
+        if (engine.getFieldID(finalPath) !== undefined)
+        {
+          return `There is already a field named ${name}`;
+        }
+        const matchingNames = checked
+          .filter((v, fId) => v)
+          .filter((v, fId) =>
+          {
+            const origName = engine.getFieldPath(fId).get(rootPath.size);
+            const nameToUse = renames.get(fId) === undefined ? origName : renames.get(fId);
+            return nameToUse === name;
+          });
+        if (matchingNames.size > 1)
+        {
+          return `You cannot promote multiple fields to the same name`;
+        }
+        return '';
+      };
+      return memoizeOne(nameValidator);
+    };
+    return _.memoize(nameValidatorFactory);
+  }
+
+  public validateName(id: number, name: string): string
+  {
+    const { renames, checked } = this.state;
+    const { engineVersion, promoteFieldRoot } = this.props.templateEditor.uiState;
+    const engine = this.props.templateEditor.getCurrentEngine();
+    return this._validationFactoryComputer(promoteFieldRoot, engine, engineVersion)(id)(name, renames, checked);
+  }
+
+  public canConfirm()
+  {
+    const { renames, checked } = this.state;
+    const { engineVersion, promoteFieldRoot } = this.props.templateEditor.uiState;
+    if (promoteFieldRoot == null)
+    {
+      return false;
+    }
+    const engine = this.props.templateEditor.getCurrentEngine();
+    const rootPath = engine.getFieldPath(promoteFieldRoot);
+    const anyErrors = checked.find((isChecked, id) =>
+    {
+      if (isChecked)
+      {
+        const thisPath = engine.getFieldPath(id);
+        const origName = thisPath.get(rootPath.size);
+        const nameToShow = renames.get(id) === undefined ? origName : renames.get(id);
+        return this.validateName(id, nameToShow as string) !== '';
+      }
+      return false;
+    });
+    const anyChecked = checked.find((isChecked, id) => isChecked);
+    return anyErrors == null && anyChecked != null;
+  }
+
   public renderRow(id: number)
   {
     const { checked, renames } = this.state;
@@ -124,7 +196,8 @@ class MultiPromoteModal extends TerrainComponent<Props>
     const thisPath = engine.getFieldPath(id);
     const origName = thisPath.get(rootPath.size);
     const nameToShow = renames.get(id) === undefined ? origName : renames.get(id);
-
+    const style = fontColor(Colors().logLevels.warn);
+    const validation = this.validateName(id, nameToShow as string);
     return (
       <div
         key={id}
@@ -142,13 +215,35 @@ class MultiPromoteModal extends TerrainComponent<Props>
           canEdit={checked.get(id) === true}
           onChange={this.nameInputFactory(id)}
         />
+        <div
+          className='promote-field-verification-spacer'
+          key={id}
+        >
+          {
+            validation !== '' &&
+            tooltip(
+              <div
+                style={fontColor(Colors().logLevels.error)}
+                className='promote-field-verification-icon'
+              >
+                <ErrorIcon />
+              </div>,
+              {
+                title: `${validation}`,
+                theme: 'error',
+                key: id,
+              },
+            )
+          }
+        </div>
       </div>
     );
   }
 
   public checkboxFactory(id: number)
   {
-    return () => {
+    return () =>
+    {
       const checked = this.state.checked.get(id);
       const newVal = !checked;
       this.setState({
@@ -159,7 +254,8 @@ class MultiPromoteModal extends TerrainComponent<Props>
 
   public nameInputFactory(id: number)
   {
-    return (newVal: string) => {
+    return (newVal: string) =>
+    {
       this.setState({
         renames: this.state.renames.set(id, newVal),
       });
@@ -186,7 +282,7 @@ class MultiPromoteModal extends TerrainComponent<Props>
   {
     return (
       <div className='multi-promote-modal'>
-        { this.computeOptions().map((id) => this.renderRow(id))}
+        {this.computeOptions().map((id) => this.renderRow(id))}
       </div>
     );
   }
@@ -199,6 +295,7 @@ class MultiPromoteModal extends TerrainComponent<Props>
         open={promoteFieldRoot !== null}
         title={'Select Fields To Promote'}
         confirm={true}
+        confirmDisabled={promoteFieldRoot !== null && !this.canConfirm()}
         closeOnConfirm={true}
         onClose={this.handleCloseModal}
         onConfirm={this.handleConfirmModal}
@@ -227,7 +324,8 @@ class MultiPromoteModal extends TerrainComponent<Props>
     const rootPath = engine.getFieldPath(promoteFieldRoot);
 
     const renameMapping: Immutable.Iterable<number, KeyPath> = checked.filter((isChecked) => isChecked)
-      .map((isChecked, id) => {
+      .map((isChecked, id) =>
+      {
         const thisPath = engine.getFieldPath(id);
         const origName = thisPath.get(rootPath.size);
         const nameToUse = renames.get(id) === undefined ? origName : renames.get(id);
@@ -236,7 +334,8 @@ class MultiPromoteModal extends TerrainComponent<Props>
 
     GraphHelpers.mutateEngine((proxy) =>
     {
-      renameMapping.forEach((path, id) => {
+      renameMapping.forEach((path, id) =>
+      {
         const fieldProxy = proxy.makeFieldProxy(id);
         fieldProxy.structuralChangeName(path);
       });
