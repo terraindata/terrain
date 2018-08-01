@@ -54,7 +54,6 @@ import { MenuOption } from 'common/components/Menu';
 import { List } from 'immutable';
 import * as React from 'react';
 import Util from 'util/Util';
-import Ajax from '../../util/Ajax';
 import * as UserTypes from '../UserTypes';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -195,18 +194,28 @@ class Team extends TerrainComponent<Props>
       addingUser: false,
     });
 
-    Ajax.createUser(name, email, password, () =>
-    {
-      this.props.userActions({
-        actionType: 'fetch',
-      });
-    }, (error) =>
+    this.props.userActions({
+      actionType: 'create',
+      user: {
+        name,
+        email,
+        password,
+      },
+    })
+      .then(() =>
+      {
+        this.props.userActions({
+          actionType: 'fetch',
+        });
+      })
+      .catch((error) =>
       {
         this.setState({
           errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
         });
         this.toggleErrorModal();
       });
+
     return true;
   }
 

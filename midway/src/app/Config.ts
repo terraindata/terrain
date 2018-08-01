@@ -81,7 +81,7 @@ export function loadConfigFromFile(config: Config): Config
     }
     catch (e)
     {
-      MidwayLogger.error('Failed to read configuration settings from ' + String(config.config));
+      MidwayLogger.warn('Failed to read configuration settings from ' + String(config.config));
     }
   }
 

@@ -42,83 +42,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017-2018 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import { AxiosInstance } from 'axios';
+import { recordForSave } from 'shared/util/Classes';
+import { User } from 'users/UserTypes';
 
-import cmdLineArgs = require('command-line-args');
-import cmdLineUsage = require('command-line-usage');
-import { Config } from './Config';
+// making this an instance in case we want stateful things like cancelling ajax requests
+class UserApi
+{
+  public xhr: AxiosInstance = null;
 
-const optionList = [
+  public constructor(xhr: AxiosInstance)
   {
-    alias: 'c',
-    defaultValue: 'config.json',
-    name: 'config',
-    type: String,
-    typeLabel: 'file',
-    description: 'Configuration file to use.',
-  },
-  {
-    alias: 'p',
-    defaultValue: 3001,
-    name: 'port',
-    type: Number,
-    typeLabel: 'number',
-    description: 'Port to listen on.',
-  },
-  {
-    name: 'debug',
-    type: Boolean,
-    description: 'Turn on debug mode.',
-  },
-  {
-    name: 'demo',
-    type: Boolean,
-    description: 'Serve Terrain demo website.',
-  },
-  {
-    alias: 'h',
-    name: 'help',
-    type: Boolean,
-    description: 'Show help and usage information.',
-  },
-  {
-    alias: 'v',
-    name: 'verbose',
-    type: Boolean,
-    description: 'Print verbose information.',
-  },
-  {
-    alias: 'i',
-    defaultValue: 'abc',
-    name: 'instanceId',
-    type: String,
-    typeLabel: 'id',
-    description: 'Unique identifier to use for this instance.',
-  },
-  {
-    alias: 'd',
-    name: 'db',
-    type: String,
-    defaultValue: 'http://127.0.0.1:9200',
-    description: 'Analytics datastore connection parameters',
-  },
-];
+    this.xhr = xhr;
+  }
 
-const sections = [
+  public getUsers()
   {
-    header: 'sigint 1.0',
-    content: 'Terrain Analytics Server.',
-  },
-  {
-    header: 'Options',
-    optionList,
-  },
-];
+    return this.xhr.get('/users');
+  }
 
-export let CmdLineArgs: Config = cmdLineArgs(optionList,
+  public saveUser(payload: { user: User, meta: object })
   {
-    partial: true,
-  });
+    const userData: object = recordForSave(payload['user']);
 
-export const CmdLineUsage = cmdLineUsage(sections);
-export default CmdLineArgs;
+    if (payload.hasOwnProperty('meta'))
+    {
+      Object.assign(userData, payload['meta']);
+    }
+
+    return this.xhr.post(
+      `users/${payload['user']['id']}`,
+      { body: userData },
+    );
+  }
+
+  public changePassword(id: number, oldPassword: string, newPassword: string)
+  {
+    return this.xhr.post(
+      `users/${id}`,
+      {
+        body: {
+          oldPassword,
+          password: newPassword,
+        },
+      },
+    );
+  }
+
+  public createUser(user)
+  {
+    return this.xhr.post(
+      `users`,
+      {
+        body: user,
+      },
+    );
+  }
+}
+
+export default UserApi;

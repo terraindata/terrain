@@ -62,7 +62,6 @@ import * as momentZon from 'moment-timezone';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
 import { Colors, OldThemesArray } from '../../colors/Colors';
-import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
@@ -211,13 +210,17 @@ class Settings extends TerrainComponent<Props>
       confirmPassword: '',
     });
 
-    Ajax.changePassword(+userId, currentPassword, newPassword, () =>
-    {
-      this.props.userActions({
-        actionType: 'fetch',
-      });
-      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
-    }, (error) =>
+    this.props.userActions({
+      actionType: 'changePassword',
+      userId: +userId,
+      currentPassword,
+      newPassword,
+    })
+      .then(() =>
+      {
+        notificationManager.addNotification('Success', 'Updated password', 'info', 4);
+      })
+      .catch((error) =>
       {
         this.setState({
           modalMessage: 'Error changing your password: ' + MidwayError.fromJSON(error).getDetail(),
@@ -286,7 +289,7 @@ class Settings extends TerrainComponent<Props>
     );
   }
 
-  public updateUserPassword(editingSections)
+  public updateUserPassword(editingSections, onSuccess)
   {
     const userId: number = localStorage['id'];
     const currentPassword: string = editingSections.currentPassword;
@@ -330,13 +333,19 @@ class Settings extends TerrainComponent<Props>
       confirmPassword: '',
     });
 
-    Ajax.changePassword(+userId, currentPassword, newPassword, () =>
-    {
-      this.props.userActions({
-        actionType: 'fetch',
-      });
-      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
-    }, (error) =>
+    this.props.userActions(
+      {
+        actionType: 'changePassword',
+        userId: +userId,
+        currentPassword,
+        newPassword,
+      })
+      .then(() =>
+      {
+        notificationManager.addNotification('Success', 'Updated password', 'info', 4);
+        onSuccess();
+      })
+      .catch((error) =>
       {
         this.setState({
           modalMessage: 'Error changing your password: ' + String(errorToReadable(error)),
@@ -699,7 +708,7 @@ class Settings extends TerrainComponent<Props>
   //   lastEntry={true}
   //   />
 
-  public updateUserInfo(editingSections, onSuccess?: () => any, onError?: (error) => any)
+  public updateUserInfo(editingSections, onSuccess: () => any = () => { }, onError: (error) => any = () => { })
   {
     let newUser = this.props.users.users.get(this.props.users.currentUser.id);
     const meta = {};
@@ -718,9 +727,9 @@ class Settings extends TerrainComponent<Props>
       actionType: 'change',
       user: newUser,
       meta,
-      onSave: onSuccess ? onSuccess : () => { },
-      onError: onError ? onError : () => { },
-    });
+    })
+      .then(() => onSuccess())
+      .catch((error) => onError(error));
     return true;
   }
 

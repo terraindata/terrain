@@ -12,7 +12,7 @@
     ],
     "file-header" : [
       true,
-      "Copyright \\d{4} Terrain Data, Inc."
+      "Copyright (\\d{4}-\\d{4})|(\\d{4}) Terrain Data, Inc."
     ],
     "one-line" : [
       true,
@@ -47,7 +47,6 @@
     "prefer-for-of" : false,
     "strict-boolean-expressions" : true,
     "object-literal-sort-keys" : false,
-    "no-unused-variable": true,
     "interface-name" : [
       true,
       "never-prefix"

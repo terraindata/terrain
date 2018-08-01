@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017-2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
 
@@ -58,6 +58,7 @@ export interface Config
   help?: boolean;
   verbose?: boolean;
   db?: string;
+  instanceId?: string;
 }
 
 function updateObject<T>(obj: T, newObj: T): T
@@ -85,7 +86,7 @@ export function loadConfigFromFile(config: Config): Config
     }
     catch (e)
     {
-      logger.error('Failed to read configuration settings from ' + String(config.config));
+      logger.warn('Failed to read configuration settings from ' + String(config.config));
     }
   }
   return config;
