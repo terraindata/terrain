@@ -206,6 +206,7 @@ class EditorDisplayStateC
     index: number,
     isIndexExtract: boolean,
   } = null;
+  public promoteFieldRoot: number = null;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

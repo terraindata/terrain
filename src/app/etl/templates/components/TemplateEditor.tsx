@@ -66,6 +66,7 @@ import { EndpointsColumn, OptionsColumn, StepsColumn } from 'etl/templates/compo
 import AddFieldModal from 'etl/templates/components/field/AddFieldModal';
 import ExtractFieldModal from 'etl/templates/components/field/ExtractFieldModal';
 import MoveFieldModal from 'etl/templates/components/field/MoveFieldModal';
+import MultiPromoteModal from 'etl/templates/components/field/MultiPromoteModal';
 import RootFieldNode from 'etl/templates/components/field/RootFieldNode';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -267,6 +268,7 @@ class TemplateEditor extends TerrainComponent<Props>
           fieldId={addFieldId}
           {...fieldModalProps}
         />
+        <MultiPromoteModal />
         <ExtractFieldModal />
         <MultiModal
           requests={modalRequests}

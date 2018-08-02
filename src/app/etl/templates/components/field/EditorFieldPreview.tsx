@@ -109,6 +109,13 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         text: 'Add a subfield',
         onClick: this.requestAddField,
       });
+      if (field.isNamedField())
+      {
+        options.push({
+          text: 'Promote Inner Fields',
+          onClick: this.requestPromoteFields,
+        });
+      }
     }
     if (field.canMoveField())
     {
@@ -241,7 +248,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       const style = type === 'error' ? fontColor(Colors().logLevels.error) : fontColor(Colors().logLevels.warn);
       return (
         <div
-          className='field-verifiction-spacer'
+          className='field-verification-spacer'
           key={key}
         >
           {
@@ -383,6 +390,16 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       actionType: 'setDisplayState',
       state: {
         moveFieldId: this.props.fieldId,
+      },
+    });
+  }
+
+  public requestPromoteFields()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        promoteFieldRoot: this.props.fieldId,
       },
     });
   }

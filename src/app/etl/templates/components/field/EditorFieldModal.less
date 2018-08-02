@@ -31,3 +31,40 @@
     padding: @spacing;
   }
 }
+
+.multi-promote-modal {
+  padding: @double-spacing;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  .promote-field-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: @half-spacing;
+  }
+
+  .multi-promote-title {
+    padding: @spacing;
+  }
+
+  .promote-field-verification-spacer {
+    margin-left: @half-spacing;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.promote-field-verification-icon {
+  svg {
+    fill: currentColor;
+    height: 14px;
+    width: 14px;
+  }
+}
+

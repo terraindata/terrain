@@ -328,6 +328,10 @@ export class FieldProxy
       }
       this.syncWithEngine(true);
     }
+    else
+    {
+      throw new Error('Cannot Perform that action. New path is invalid');
+    }
   }
 
   // add a field under this field
