@@ -475,11 +475,7 @@ export class RouteSelector extends TerrainComponent<Props>
     {
       const textValueLengthLimit = 28;
       const textValueLength = (value !== null && value !== undefined) ? value.length : 0;
-      let multiLineFlag = false;
-      if (textValueLength >= textValueLengthLimit)
-      {
-        multiLineFlag = true;
-      }
+      const multiLineFlag = textValueLength > textValueLengthLimit;
       textboxContent = (
         <FloatingInput
           value={value}

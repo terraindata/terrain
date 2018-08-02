@@ -159,6 +159,7 @@ export class FloatingInput extends TerrainComponent<Props>
     const isFloating = this.isFloating();
 
     const textValueLengthLimit = 28;
+    const lineHeightEstimate = 22;
     const textValueLength = (value !== null && value !== undefined) ? value.length : 0;
     let rowCount = 0;
     if (this.props.multiLine)
@@ -169,7 +170,7 @@ export class FloatingInput extends TerrainComponent<Props>
     const containerFullStyle = _.extend(
       {},
       containerStyle, backgroundColor(props.noBg ? '' : Colors().fontWhite),
-      { height: props.multiLine ? (rowCount * 22) + 28 : 'auto' },
+      { height: props.multiLine ? (rowCount * lineHeightEstimate) + textValueLengthLimit : 'auto' },
     );
     return (
       <div
@@ -282,6 +283,10 @@ export class FloatingInput extends TerrainComponent<Props>
             autoFocus={props.autoFocus}
             onFocus={this.handleFocus}
             onBlur={this.handleBlur}
+            id={state.myId}
+            ref={this.getValueRef}
+            onKeyDown={this.handleKeyDown}
+            disabled={!props.canEdit}
           />
         );
       }
