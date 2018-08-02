@@ -473,6 +473,13 @@ export class RouteSelector extends TerrainComponent<Props>
     }
     if (optionSet.hasOther)
     {
+      const textValueLengthLimit = 28;
+      const textValueLength = (value !== null && value !== undefined) ? value.length : 0;
+      let multiLineFlag = false;
+      if (textValueLength >= textValueLengthLimit)
+      {
+        multiLineFlag = true;
+      }
       textboxContent = (
         <FloatingInput
           value={value}
@@ -487,6 +494,7 @@ export class RouteSelector extends TerrainComponent<Props>
           id={index}
           options={optionSet.showOptionsOnOther ?
             optionSet.options.map((option) => option.value).toList() : undefined}
+          multiLine={multiLineFlag}
         />
       );
     }

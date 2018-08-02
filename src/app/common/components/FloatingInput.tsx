@@ -103,6 +103,7 @@ export interface Props
   showWarning?: boolean;
   warningText?: string;
   options?: List<string>;
+  multiLine?: boolean;
 }
 
 @Radium
@@ -156,9 +157,19 @@ export class FloatingInput extends TerrainComponent<Props>
     const { value, onClick, useTooltip } = props;
 
     const isFloating = this.isFloating();
+
+    const textValueLengthLimit = 28;
+    const textValueLength = (value !== null && value !== undefined) ? value.length : 0;
+    let rowCount = 0;
+    if (this.props.multiLine)
+    {
+      rowCount = Math.ceil(textValueLength / textValueLengthLimit);
+    }
+
     const containerFullStyle = _.extend(
       {},
       containerStyle, backgroundColor(props.noBg ? '' : Colors().fontWhite),
+      { height: props.multiLine ? (rowCount * 22) + 28 : 'auto' },
     );
     return (
       <div
@@ -258,6 +269,20 @@ export class FloatingInput extends TerrainComponent<Props>
               disabled={!props.canEdit}
             />
           </div>
+        );
+      }
+      if (this.props.multiLine)
+      {
+        return (
+          <textarea
+            className='floating-input-multiline'
+            style={{ border: Colors().bg, color: Colors().mainBlue }}
+            value={value === null || value === undefined ? '' : value}
+            onChange={this._fn(this.handleChange, false)}
+            autoFocus={props.autoFocus}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+          />
         );
       }
       // Return a text input
