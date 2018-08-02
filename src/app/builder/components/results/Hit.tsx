@@ -369,8 +369,9 @@ class HitComponent extends TerrainComponent<Props> {
     if (video.paused)
     {
       const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.then( () => { } ).catch( () => { } );
+      if (playPromise !== undefined)
+      {
+        playPromise.then(() => { }).catch(() => { });
       }
     }
   }
@@ -802,88 +803,88 @@ class HitComponent extends TerrainComponent<Props> {
           ]}
           onDoubleClick={this.expand}
         >
-         {
-          thumbnail &&
-          [
-          <div className={classNames({
-            'result-thumbnail-wrapper': true,
-            'results-are-small': hitSize === 'small' || hitSize === 'smaller',
-          })}
-          style={{
-            width: thumbnailWidth,
-            minWidth: thumbnailWidth,
-            backgroundImage: `url(${thumbnail})`,
-          }}
-          key={1}>
           {
-          (thumbnail.includes('imgur') && !thumbnail.includes('gif'))
-          ?
-          <video id='thumbnailVideo' className={thumbnail} src={thumbnail.concat('.webm')}
-          onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
-          style={{
-            width: thumbnailWidth,
-            minWidth: thumbnailWidth,
-          }}> </video>
-          :
-          (thumbnail.includes('gifv'))
-          ?
-          <video id='thumbnailVideo'  className={thumbnail} src={thumbnail.replace('gifv', 'webm')}
-          onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
-          style={{
-            width: thumbnailWidth,
-            minWidth: thumbnailWidth,
-          }}> </video>
-          :
-          (thumbnail.includes('youtube'))
-          ?
-          <iframe id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('watch?v=', 'embed/')}
-          onMouseOver={this.onYoutubeVideoHoverStart}
-          onMouseOut={this.onYoutubeVideoHoverStop}
-          style={{
-            width: thumbnailWidth,
-            minWidth: thumbnailWidth,
-          }}>
-          </iframe>
-          :
-          (thumbnail.includes('vimeo'))
-          ?
-          <iframe id='thumbnailVideo'  className={thumbnail} src={thumbnail.replace('vimeo.com', 'player.vimeo.com/video')}
-          style={{
-            width: thumbnailWidth,
-            minWidth: thumbnailWidth,
-          }}>
-          </iframe>
-          :
-          (thumbnail.includes('mp4') || thumbnail.includes('webm'))
-          ?
-          <video id='thumbnailVideo'  className={thumbnail} src={thumbnail}
-          onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
-          style={{
-            width: thumbnailWidth,
-            minWidth: thumbnailWidth,
-          }}> </video>
-          :
-          null
-        }
-          </div>
-          ,
-          this.state.hovered &&
-          <Draggable
-          axis='x'
-          bounds='parent'
-          position={{
-            x: thumbnailWidth - 15,
-            y: 0,
-          }}
-          onDrag={this.handleThumbnailResize}
-          key={2}
-          >
-          <div
-          className='result-thumbnail-resizer'
-          />
-          </Draggable>,
-          ]
-        }
+            thumbnail &&
+            [
+              <div className={classNames({
+                'result-thumbnail-wrapper': true,
+                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+              })}
+                style={{
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                  backgroundImage: `url(${thumbnail})`,
+                }}
+                key={1}>
+                {
+                  (thumbnail.includes('imgur') && !thumbnail.includes('gif'))
+                    ?
+                    <video id='thumbnailVideo' className={thumbnail} src={thumbnail.concat('.webm')}
+                      onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+                      style={{
+                        width: thumbnailWidth,
+                        minWidth: thumbnailWidth,
+                      }}> </video>
+                    :
+                    (thumbnail.includes('gifv'))
+                      ?
+                      <video id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('gifv', 'webm')}
+                        onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+                        style={{
+                          width: thumbnailWidth,
+                          minWidth: thumbnailWidth,
+                        }}> </video>
+                      :
+                      (thumbnail.includes('youtube'))
+                        ?
+                        <iframe id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('watch?v=', 'embed/')}
+                          onMouseOver={this.onYoutubeVideoHoverStart}
+                          onMouseOut={this.onYoutubeVideoHoverStop}
+                          style={{
+                            width: thumbnailWidth,
+                            minWidth: thumbnailWidth,
+                          }}>
+                        </iframe>
+                        :
+                        (thumbnail.includes('vimeo'))
+                          ?
+                          <iframe id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('vimeo.com', 'player.vimeo.com/video')}
+                            style={{
+                              width: thumbnailWidth,
+                              minWidth: thumbnailWidth,
+                            }}>
+                          </iframe>
+                          :
+                          (thumbnail.includes('mp4') || thumbnail.includes('webm'))
+                            ?
+                            <video id='thumbnailVideo' className={thumbnail} src={thumbnail}
+                              onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+                              style={{
+                                width: thumbnailWidth,
+                                minWidth: thumbnailWidth,
+                              }}> </video>
+                            :
+                            null
+                }
+              </div>
+              ,
+              this.state.hovered &&
+              <Draggable
+                axis='x'
+                bounds='parent'
+                position={{
+                  x: thumbnailWidth - 15,
+                  y: 0,
+                }}
+                onDrag={this.handleThumbnailResize}
+                key={2}
+              >
+                <div
+                  className='result-thumbnail-resizer'
+                />
+              </Draggable>,
+            ]
+          }
           <div
             className={classNames({
               'result-details-wrapper': true,
