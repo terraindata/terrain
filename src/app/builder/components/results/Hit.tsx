@@ -818,63 +818,49 @@ class HitComponent extends TerrainComponent<Props> {
           {
           (thumbnail.includes('imgur') && !thumbnail.includes('gif'))
           ?
-          <video className={thumbnail} src={thumbnail.concat('.webm')}
+          <video id='thumbnailVideo' className={thumbnail} src={thumbnail.concat('.webm')}
           onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
           style={{
             width: thumbnailWidth,
             minWidth: thumbnailWidth,
-            position: 'relative',
-            top: '50%',
-            transform: 'translateY(-50%)',
           }}> </video>
           :
           (thumbnail.includes('gifv'))
           ?
-          <video className={thumbnail} src={thumbnail.replace('gifv', 'webm')}
+          <video id='thumbnailVideo'  className={thumbnail} src={thumbnail.replace('gifv', 'webm')}
           onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
           style={{
             width: thumbnailWidth,
             minWidth: thumbnailWidth,
-            position: 'relative',
-            top: '50%',
-            transform: 'translateY(-50%)',
           }}> </video>
           :
           (thumbnail.includes('youtube'))
           ?
-          <iframe className={thumbnail} src={thumbnail.replace('watch?v=', 'embed/')} onMouseOver={this.onYoutubeVideoHoverStart}
+          <iframe id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('watch?v=', 'embed/')}
+          onMouseOver={this.onYoutubeVideoHoverStart}
           onMouseOut={this.onYoutubeVideoHoverStop}
           style={{
             width: thumbnailWidth,
             minWidth: thumbnailWidth,
-            position: 'relative',
-            top: '50%',
-            transform: 'translateY(-50%)',
           }}>
           </iframe>
           :
           (thumbnail.includes('vimeo'))
           ?
-          <iframe className={thumbnail} src={thumbnail.replace('vimeo.com', 'player.vimeo.com/video')}
+          <iframe id='thumbnailVideo'  className={thumbnail} src={thumbnail.replace('vimeo.com', 'player.vimeo.com/video')}
           style={{
             width: thumbnailWidth,
             minWidth: thumbnailWidth,
-            position: 'relative',
-            top: '50%',
-            transform: 'translateY(-50%)',
           }}>
           </iframe>
           :
           (thumbnail.includes('mp4') || thumbnail.includes('webm'))
           ?
-          <video className={thumbnail} src={thumbnail}
+          <video id='thumbnailVideo'  className={thumbnail} src={thumbnail}
           onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
           style={{
             width: thumbnailWidth,
             minWidth: thumbnailWidth,
-            position: 'relative',
-            top: '50%',
-            transform: 'translateY(-50%)',
           }}> </video>
           :
           null
