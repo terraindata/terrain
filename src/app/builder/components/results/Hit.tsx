@@ -363,6 +363,40 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
+  public onVideoHoverStart(e)
+  {
+    const video: HTMLVideoElement = document.getElementsByClassName(e.target.className)[0] as HTMLVideoElement;
+    if (video.paused)
+    {
+      const playPromise = video.play();
+      if (playPromise !== undefined)
+      {
+        playPromise.then(() => { }).catch(() => { });
+      }
+    }
+  }
+
+  public onVideoHoverStop(e)
+  {
+    const video: HTMLVideoElement = document.getElementsByClassName(e.target.className)[0] as HTMLVideoElement;
+    if (!video.paused)
+    {
+      video.pause();
+    }
+  }
+
+  public onYoutubeVideoHoverStart(e)
+  {
+    const video: HTMLMediaElement = document.getElementsByClassName(e.target.className)[0] as HTMLMediaElement;
+    video.src = e.target.className.replace('watch?v=', 'embed/').concat('?autoplay=1&mute=1&loop=1');
+  }
+
+  public onYoutubeVideoHoverStop(e)
+  {
+    const video: HTMLMediaElement = document.getElementsByClassName(e.target.className)[0] as HTMLMediaElement;
+    video.src = e.target.className.replace('watch?v=', 'embed/');
+  }
+
   public renderNestedItems(items, format, field, depth, offset)
   {
     return (
@@ -772,18 +806,66 @@ class HitComponent extends TerrainComponent<Props> {
           {
             thumbnail &&
             [
-              <div
-                className={classNames({
-                  'result-thumbnail-wrapper': true,
-                  'results-are-small': hitSize === 'small' || hitSize === 'smaller',
-                })}
+              <div className={classNames({
+                'result-thumbnail-wrapper': true,
+                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+              })}
                 style={{
-                  backgroundImage: `url(${thumbnail})`,
                   width: thumbnailWidth,
                   minWidth: thumbnailWidth,
+                  backgroundImage: `url(${thumbnail})`,
                 }}
-                key={1}
-              >
+                key={1}>
+                {
+                  (thumbnail.includes('imgur') && !thumbnail.includes('gif'))
+                    ?
+                    <video id='thumbnailVideo' className={thumbnail} src={thumbnail.concat('.webm')}
+                      onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+                      style={{
+                        width: thumbnailWidth,
+                        minWidth: thumbnailWidth,
+                      }}> </video>
+                    :
+                    (thumbnail.includes('gifv'))
+                      ?
+                      <video id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('gifv', 'webm')}
+                        onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+                        style={{
+                          width: thumbnailWidth,
+                          minWidth: thumbnailWidth,
+                        }}> </video>
+                      :
+                      (thumbnail.includes('youtube'))
+                        ?
+                        <iframe id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('watch?v=', 'embed/')}
+                          onMouseOver={this.onYoutubeVideoHoverStart}
+                          onMouseOut={this.onYoutubeVideoHoverStop}
+                          style={{
+                            width: thumbnailWidth,
+                            minWidth: thumbnailWidth,
+                          }}>
+                        </iframe>
+                        :
+                        (thumbnail.includes('vimeo'))
+                          ?
+                          <iframe id='thumbnailVideo' className={thumbnail} src={thumbnail.replace('vimeo.com', 'player.vimeo.com/video')}
+                            style={{
+                              width: thumbnailWidth,
+                              minWidth: thumbnailWidth,
+                            }}>
+                          </iframe>
+                          :
+                          (thumbnail.includes('mp4') || thumbnail.includes('webm'))
+                            ?
+                            <video id='thumbnailVideo' className={thumbnail} src={thumbnail}
+                              onMouseOver={this.onVideoHoverStart} onMouseOut={this.onVideoHoverStop} loop
+                              style={{
+                                width: thumbnailWidth,
+                                minWidth: thumbnailWidth,
+                              }}> </video>
+                            :
+                            null
+                }
               </div>
               ,
               this.state.hovered &&
