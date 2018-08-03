@@ -638,7 +638,7 @@ class HitComponent extends TerrainComponent<Props> {
       actionType: 'spotlightAction',
       id,
       hit: spotlightData,
-      parentHit: this.props.parentHit.toJS()['fields'],
+      parentHit: this.props.parentHit ? this.props.parentHit.toJS()['fields'] : undefined,
     });
     this.props.onSpotlightAdded(id, spotlightData);
   }
