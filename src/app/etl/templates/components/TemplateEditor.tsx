@@ -136,7 +136,7 @@ class TemplateEditor extends TerrainComponent<Props>
       {
         resetEngine.enableField(id);
       });
-      return resetEngine.transform(previewDocument);
+      return resetEngine.transform(previewDocument, { includeUnknown: true });
     }
     catch (e)
     {

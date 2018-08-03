@@ -66,6 +66,8 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import UnrecognizedField from './UnrecognizedField';
+
 import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
@@ -110,11 +112,16 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const { canEdit, preview, displayKeyPath } = this.props;
     const field = this._field();
 
+    const unvisited = new Set(preview != null ? Object.keys(preview) : []);
     const childFieldIds = this.computeChildFields(field.childrenIds, this._currentComparator());
-    return childFieldIds.map((childId, index) =>
+    const childFields = childFieldIds.map((childId, index) =>
     {
       const childField = this._field(childId);
       const childPreview = preview != null ? preview[childField.name] : null;
+      if (unvisited.has(childField.name))
+      {
+        unvisited.delete(childField.name);
+      }
       return (
         <EditorFieldNode
           {...this._passProps({
@@ -126,6 +133,17 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         />
       );
     }).toList();
+
+    const unrecognized = List(unvisited.values()).map((key) => {
+      return (
+        <UnrecognizedField
+          key={key}
+          name={key}
+          preview={preview[key]}
+        />
+      );
+    });
+    return childFields.concat(unrecognized);
   }
 
   @instanceFnDecorator(memoizeOne)

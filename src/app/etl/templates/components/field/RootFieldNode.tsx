@@ -60,6 +60,7 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import UnrecognizedField from './UnrecognizedField';
 
 import './TemplateEditorField.less';
 
@@ -117,9 +118,14 @@ class RootFieldNode extends TerrainComponent<Props>
       engineVersion,
       templateEditor.getCurrentComparator(),
     );
-    return rootFields.map((childField, index) =>
+    const unvisited = new Set(preview != null ? Object.keys(preview) : []);
+    const rootComponents = rootFields.map((childField, index) =>
     {
       const childPreview = preview != null ? preview[childField.name] : null;
+      if (unvisited.has(childField.name))
+      {
+        unvisited.delete(childField.name);
+      }
       return (
         <EditorFieldNode
           fieldId={childField.fieldId}
@@ -131,6 +137,18 @@ class RootFieldNode extends TerrainComponent<Props>
         />
       );
     }).toList();
+
+    const unrecognized = List(unvisited.values()).map((key) => {
+      return (
+        <UnrecognizedField
+          key={key}
+          name={key}
+          isRoot={true}
+          preview={preview[key]}
+        />
+      );
+    });
+    return rootComponents.concat(unrecognized);
   }
 
   public render()
