@@ -142,7 +142,7 @@ class RootFieldNode extends TerrainComponent<Props>
       return (
         <UnrecognizedField
           key={key}
-          name={key}
+          path={this._ikeyPath(emptyList, key)}
           isRoot={true}
           preview={preview[key]}
         />

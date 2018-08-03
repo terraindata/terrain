@@ -204,16 +204,6 @@ export class EngineProxy
     return newId;
   }
 
-  public addRootField(name: string, type: FieldTypes)
-  {
-    const pathToAdd = List([name]);
-    if (Utils.validation.canAddField(this.engine, -1, pathToAdd).isValid)
-    {
-      this.addInferredField(pathToAdd, type);
-      this.requestRebuild();
-    }
-  }
-
   /*
    *  If applyToChildren is true, set all children of the field
    *  to have the same enabled/disabled state.

@@ -64,6 +64,7 @@ import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPr
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, OptionsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
 import AddFieldModal from 'etl/templates/components/field/AddFieldModal';
+import AddUnrecognizedFieldModal from 'etl/templates/components/field/AddUnrecognizedFieldModal';
 import ExtractFieldModal from 'etl/templates/components/field/ExtractFieldModal';
 import MoveFieldModal from 'etl/templates/components/field/MoveFieldModal';
 import MultiPromoteModal from 'etl/templates/components/field/MultiPromoteModal';
@@ -269,6 +270,7 @@ class TemplateEditor extends TerrainComponent<Props>
           {...fieldModalProps}
         />
         <MultiPromoteModal />
+        <AddUnrecognizedFieldModal />
         <ExtractFieldModal />
         <MultiModal
           requests={modalRequests}

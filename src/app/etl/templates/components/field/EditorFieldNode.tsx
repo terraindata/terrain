@@ -138,7 +138,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       return (
         <UnrecognizedField
           key={key}
-          name={key}
+          path={this._ikeyPath(field.fieldPath, key)}
           preview={preview[key]}
         />
       );

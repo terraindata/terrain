@@ -311,7 +311,7 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
   {
     GraphHelpers.mutateEngine((proxy) =>
     {
-      proxy.addRootField(this.state.name, this.state.type);
+      proxy.addField(List([this.state.name]), this.state.type);
     }).then((isStructural) =>
     {
       if (isStructural)

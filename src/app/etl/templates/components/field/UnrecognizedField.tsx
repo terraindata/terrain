@@ -59,6 +59,7 @@ const { List, Map } = Immutable;
 
 import Modal from 'common/components/Modal';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import Quarantine from 'util/RadiumQuarantine';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
@@ -71,12 +72,12 @@ import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 
-const ErrorIcon = require('images/icon_info.svg');
+const AddIcon = require('images/icon_add.svg');
 import './TemplateEditorField.less';
 
 interface Props
 {
-  name: string;
+  path: KeyPath;
   preview: any;
   isRoot?: boolean;
   // below from container
@@ -92,6 +93,12 @@ interface FormState
 
 class UnrecognizedField extends TerrainComponent<Props>
 {
+  public state: {
+    hovered: boolean;
+  } = {
+    hovered: false,
+  };
+
   public renderTypeIcon()
   {
     return (
@@ -120,10 +127,28 @@ class UnrecognizedField extends TerrainComponent<Props>
   {
     const labelStyle = fontColor(Colors().text3);
     return (
-      <div className='editor-field-main-row'>
+      <div
+        className='editor-field-main-row'
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
+      >
         <div className='template-editor-field-block'>
           <div className='field-preview-row' style={labelStyle}>
-            <div style={{width: this.props.isRoot ? '76px' : '52px'}}/>
+            <Quarantine>
+              <div
+                className='unrecognized-field-add'
+                onClick={this.handleAddClicked}
+                style={[
+                  {
+                    width: this.props.isRoot ? '76px' : '52px',
+                    opacity: this.state.hovered ? 1.0 : 0,
+                  },
+                  fontColor(Colors().text3, Colors().text2),
+                ]}
+              >
+                <AddIcon/>
+              </div>
+            </Quarantine>
             <div className='field-preview-label-group'>
               {
                 this.renderTypeIcon()
@@ -134,7 +159,7 @@ class UnrecognizedField extends TerrainComponent<Props>
                 })}
                 key='label'
               >
-                {this.props.name}
+                {this.props.path.last()}
               </div>
             </div>
             {
@@ -155,10 +180,34 @@ class UnrecognizedField extends TerrainComponent<Props>
         onToggle={noOp}
         onDrop={noOp}
         hideControls={true}
-        keyPath={this._ikeyPath(SEED_KEY_PATH, this.props.name)}
+        keyPath={this.props.path}
         canDrag={false}
       />
     );
+  }
+
+  public handleAddClicked()
+  {
+    this.props.editorAct({
+      actionType: 'setDisplayState',
+      state: {
+        addUnrecognizedPath: this.props.path,
+      },
+    });
+  }
+
+  public handleMouseEnter()
+  {
+    this.setState({
+      hovered: true,
+    });
+  }
+
+  public handleMouseLeave()
+  {
+    this.setState({
+      hovered: false,
+    });
   }
 }
 
