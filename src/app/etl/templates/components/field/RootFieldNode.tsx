@@ -138,7 +138,8 @@ class RootFieldNode extends TerrainComponent<Props>
       );
     }).toList();
 
-    const unrecognized = List(unvisited.values()).map((key) => {
+    const unrecognized = List(unvisited.values()).map((key) =>
+    {
       return (
         <UnrecognizedField
           key={key}

@@ -96,8 +96,8 @@ class UnrecognizedField extends TerrainComponent<Props>
   public state: {
     hovered: boolean;
   } = {
-    hovered: false,
-  };
+      hovered: false,
+    };
 
   public renderTypeIcon()
   {
@@ -146,7 +146,7 @@ class UnrecognizedField extends TerrainComponent<Props>
                   fontColor(Colors().text3, Colors().text2),
                 ]}
               >
-                <AddIcon/>
+                <AddIcon />
               </div>
             </Quarantine>
             <div className='field-preview-label-group'>

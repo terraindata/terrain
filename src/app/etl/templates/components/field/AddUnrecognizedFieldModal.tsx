@@ -96,7 +96,8 @@ function computeType(docs: List<object>, path: KeyPath): { type: FieldTypes, chi
   const errs = [];
   const tracker = new TypeTracker(path);
 
-  docs.forEach((doc) => {
+  docs.forEach((doc) =>
+  {
     for (const { value, location } of yadeep.search(doc, path))
     {
       tracker.push(value);
@@ -108,7 +109,8 @@ function computeType(docs: List<object>, path: KeyPath): { type: FieldTypes, chi
   {
     const arrPath = path.push(-1);
     const arrTracker = new TypeTracker(arrPath);
-    docs.forEach((doc) => {
+    docs.forEach((doc) =>
+    {
       for (const { value, location } of yadeep.search(doc, arrPath))
       {
         arrTracker.push(value);
@@ -129,13 +131,13 @@ class AddUnrecognizedFieldModal extends TerrainComponent<Props>
     suggestedChildType: FieldTypes,
     formState: FormState,
   } = {
-    suggestedType: null,
-    suggestedChildType: null,
-    formState: {
-      type: FieldTypes.String,
-      childType: FieldTypes.String,
-    },
-  };
+      suggestedType: null,
+      suggestedChildType: null,
+      formState: {
+        type: FieldTypes.String,
+        childType: FieldTypes.String,
+      },
+    };
 
   public inputMap: InputDeclarationMap<FormState> = {
     type: {
@@ -161,7 +163,8 @@ class AddUnrecognizedFieldModal extends TerrainComponent<Props>
 
   public computeIfNecessary(path: KeyPath)
   {
-    try {
+    try
+    {
       const { formState, suggestedType, suggestedChildType } = this.state;
       if (path !== null && suggestedType === null)
       {
@@ -274,6 +277,7 @@ class AddUnrecognizedFieldModal extends TerrainComponent<Props>
         closeOnConfirm={true}
         onClose={this.handleCloseModal}
         onConfirm={this.handleConfirmModal}
+        confirmDisabled={this.state.suggestedType === null}
         allowOverflow={true}
       >
         {addUnrecognizedPath !== null ? this.renderInner() : null}
@@ -297,7 +301,27 @@ class AddUnrecognizedFieldModal extends TerrainComponent<Props>
 
   public handleConfirmModal()
   {
-
+    const { addUnrecognizedPath } = this.props.uiState;
+    const { formState, suggestedType, suggestedChildType } = this.state;
+    GraphHelpers.mutateEngine((proxy) =>
+    {
+      proxy.addField(addUnrecognizedPath, formState.type, formState.childType);
+    }).then((isStructural: boolean) =>
+    {
+      this.props.editorAct({
+        actionType: 'rebuildFieldMap',
+      });
+    }).catch((err) =>
+    {
+      this.props.editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could Not Add Field: ${err}`,
+          error: true,
+        },
+      });
+    });
   }
 }
 
