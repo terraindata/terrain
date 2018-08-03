@@ -606,6 +606,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           canEdit={this.props.pathfinderContext.canEdit && customSource}
           items={source}
           onChange={this.handleSourceChange}
+          options={this.state.fieldOptions.map((opt) => opt.value).toList()}
         />
       </div>
     );

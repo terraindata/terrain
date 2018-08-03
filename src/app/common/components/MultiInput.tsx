@@ -47,8 +47,9 @@ THE SOFTWARE.
 import { backgroundColor, borderColor, Colors, getStyle } from 'app/colors/Colors';
 import * as _ from 'lodash';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
+import TerrainComponent from 'common/components/TerrainComponent';
 import './MultiInputStyle.less';
+import Autocomplete from 'common/components/Autocomplete';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -60,6 +61,7 @@ export interface Props
   action?: (keyPath, items) => void;
   onChange?: (items) => void;
   items: List<number | string>;
+  options?: List<string>;
 }
 
 class MultiInput extends TerrainComponent<Props>
@@ -144,6 +146,7 @@ class MultiInput extends TerrainComponent<Props>
     {
       case 13:
       case 9:
+      console.log('handle key down');
         this.handleCreateItem();
         break;
       default:
@@ -157,11 +160,34 @@ class MultiInput extends TerrainComponent<Props>
     });
   }
 
+  public handleAutocompleteValueChange(value)
+  {
+    this.setState({
+      newValue: value,
+    });
+  }
+
   public renderInput()
   {
     if (!this.props.canEdit)
     {
       return null;
+    }
+    console.log ('value here is ', this.state.newValue);
+    if (this.props.options)
+    {
+      return (
+        <div className='multi-input-input'>
+          <Autocomplete
+            value={this.state.newValue}
+            onChange={this.handleAutocompleteValueChange}
+            placeholder={'Add value'}
+            onKeyDown={this.handleKeyDown}
+            options={this.props.options}
+            style={{fontSize: 14}}
+          />
+        </div>
+      );
     }
     return (
       <div className='multi-input-input'>
