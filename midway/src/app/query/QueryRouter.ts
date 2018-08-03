@@ -55,6 +55,7 @@ import QueryRequest from '../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../shared/database/types/QueryResponse';
 import SharedUtil from '../../../../shared/Util';
 import Input from '../../../../src/blocks/types/Input';
+import JSONTransform from '../../app/io/streams/JSONTransform';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -195,7 +196,7 @@ QueryRouter.post('/', passport.authenticate('access-token-local'), async (ctx, n
     const queryStream: Readable = await qh.handleQuery(query) as Readable;
     ctx.type = 'text/plain';
     ctx.attachment(ctx.request.body['filename']);
-    ctx.body = queryStream;
+    ctx.body = queryStream.pipe(JSONTransform.createExportStream());
   }
   else
   {

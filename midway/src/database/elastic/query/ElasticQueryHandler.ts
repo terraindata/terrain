@@ -51,7 +51,6 @@ import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
 import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
-import JSONTransform from '../../../app/io/streams/JSONTransform';
 import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
 import { MidwayLogger } from '../../../app/log/MidwayLogger';
 import QueryHandler from '../../../app/query/QueryHandler';
@@ -153,7 +152,7 @@ export class ElasticQueryHandler extends QueryHandler
 
           if (request.streaming === true)
           {
-            return stream.pipe(JSONTransform.createExportStream());
+            return stream;
           }
           else
           {
