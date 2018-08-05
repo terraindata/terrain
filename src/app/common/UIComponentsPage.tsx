@@ -61,6 +61,8 @@ import CRONEditor from './components/CRONEditor';
 import Dropdown from './components/Dropdown';
 import Foldout from './components/Foldout';
 
+import FormSandbox from './components/dynamic-form/FormSandbox';
+
 const TrashIcon = require('../../images/icon_trash.svg?name=TrashIcon');
 
 const dropdownOptions = Immutable.List([
@@ -107,6 +109,8 @@ class UIComponentsPage extends TerrainComponent<Props>
       <div
         className='ui-page'
       >
+        <FormSandbox />
+        {space}
         <Button
           text='Standard Button'
           onClick={noop}
