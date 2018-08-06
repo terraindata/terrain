@@ -238,6 +238,23 @@ class PrefixedElasticClient extends ElasticClient<PrefixedElasticController>
         {
           this.controller.prependIndexTerm(body.query.bool.filter.term);
         }
+        else if (body.query.bool.filter.bool && body.query.bool.filter.bool.must)
+        {
+          if (body.query.bool.filter.bool.must.constructor === Array)
+          {
+            for (const termObject of body.query.bool.filter.bool.must)
+            {
+              if (termObject.term && termObject.term._index)
+              {
+                this.controller.prependIndexTerm(termObject.term);
+              }
+            }
+          }
+          else if (body.query.bool.filter.bool.must.term && body.query.bool.filter.bool.must.term._index)
+          {
+            this.controller.prependIndexTerm(body.query.bool.filter.must.term);
+          }
+        }
       }
     }
 
