@@ -43,11 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 import { backgroundColor, borderColor, Colors, getStyle } from 'app/colors/Colors';
+import Autocomplete from 'common/components/Autocomplete';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import './MultiInputStyle.less';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -60,6 +61,7 @@ export interface Props
   action?: (keyPath, items) => void;
   onChange?: (items) => void;
   items: List<number | string>;
+  options?: List<string>;
 }
 
 class MultiInput extends TerrainComponent<Props>
@@ -69,6 +71,8 @@ class MultiInput extends TerrainComponent<Props>
   } = {
       newValue: '',
     };
+
+  public clearValue: boolean = false;
 
   public deleteItem(index)
   {
@@ -118,9 +122,9 @@ class MultiInput extends TerrainComponent<Props>
     );
   }
 
-  public handleCreateItem()
+  public handleCreateItem(value?: string)
   {
-    let newValue: any = this.state.newValue;
+    let newValue: any = value || this.state.newValue;
     if (this.props.isNumber)
     {
       newValue = parseFloat(newValue);
@@ -136,6 +140,7 @@ class MultiInput extends TerrainComponent<Props>
     this.setState({
       newValue: '',
     });
+    this.clearValue = true;
   }
 
   public handleKeyDown(e)
@@ -157,11 +162,53 @@ class MultiInput extends TerrainComponent<Props>
     });
   }
 
+  public handleAutocompleteValueChange(value)
+  {
+    if (this.clearValue)
+    {
+      this.clearValue = false;
+    }
+    else
+    {
+      this.setState({
+        newValue: value,
+      });
+    }
+  }
+
+  public handleEnter(value)
+  {
+    this.handleCreateItem(value);
+  }
+
+  public handleSelectOptions(value)
+  {
+    this.handleCreateItem(value);
+  }
+
   public renderInput()
   {
     if (!this.props.canEdit)
     {
       return null;
+    }
+    if (this.props.options)
+    {
+      return (
+        <div className='multi-input-input'>
+          <Autocomplete
+            value={this.state.newValue}
+            onChange={this.handleAutocompleteValueChange}
+            placeholder={'Add value'}
+            onEnter={this.handleEnter}
+            options={this.props.options}
+            style={{ fontSize: 14 }}
+            autoFocus={true}
+            key={this.props.items.size}
+            onSelectOption={this.handleSelectOptions}
+          />
+        </div>
+      );
     }
     return (
       <div className='multi-input-input'>
