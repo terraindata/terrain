@@ -1,0 +1,41 @@
+@import "~common/Common.less";
+
+.sandbox-form-container {
+  .transition;
+  padding: @spacing;
+}
+
+.sandbox-form-controller {
+  display: flex;
+  padding-bottom: @double-spacing;
+
+  .sandbox-form-size-controller {
+    display: flex;
+    margin-left: @spacing;
+    flex-direction: column;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    align-self: flex-start;
+  }
+
+  .sandbox-form-size-row {
+    display: flex;
+  }
+
+  .sandbox-form-size-cell {
+    width: 16px;
+    height: 16px;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    .transition;
+  }
+
+  .sandbox-form-draw-border-control {
+    display: flex;
+  }
+
+  .sandbox-control-section {
+    margin-right: @double-spacing;
+    display: flex;
+  }
+}
