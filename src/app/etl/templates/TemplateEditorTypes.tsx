@@ -179,8 +179,6 @@ class EditorDisplayStateC
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = 0; // which preview document we are looking at
-  // public settingsFieldId: number = null; // which field are the settings open for
-  // public settingsDisplayKeyPath: KeyPath = null;
 
   public settingsState: {
     fieldId: number,
@@ -207,6 +205,7 @@ class EditorDisplayStateC
     isIndexExtract: boolean,
   } = null;
   public promoteFieldRoot: number = null;
+  public addUnrecognizedPath: KeyPath = null;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

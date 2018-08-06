@@ -352,11 +352,12 @@ class ETLAjax
       };
 
       const templateToRun = JSON.stringify(templateForBackend(template));
+      const isUpload = files !== undefined && Object.keys(files).length > 0;
       const payload = files !== undefined ? files : {};
 
       _.extend(payload, { template: templateToRun });
 
-      if (config.downloadName !== undefined)
+      if (config.downloadName !== undefined && !isUpload)
       {
         this.downloadFile(
           `jobs/runnow/${jobId}`,

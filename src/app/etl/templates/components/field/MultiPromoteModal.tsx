@@ -86,12 +86,6 @@ interface Props
   editorAct?: typeof TemplateEditorActions;
 }
 
-interface FormState
-{
-  name: string;
-  index?: string | number;
-}
-
 class MultiPromoteModal extends TerrainComponent<Props>
 {
   public state: {
