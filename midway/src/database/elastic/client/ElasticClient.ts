@@ -486,6 +486,23 @@ class ElasticClient<TController extends ElasticController = ElasticController> i
         {
           return body.query.bool.filter.term._index;
         }
+        else if (body.query.bool.filter.bool && body.query.bool.filter.bool.must)
+        {
+          if (body.query.bool.filter.bool.must.constructor === Array)
+          {
+            for (const termObject of body.query.bool.filter.bool.must)
+            {
+              if (termObject.term && termObject.term._index)
+              {
+                return termObject.term._index;
+              }
+            }
+          }
+          else if (body.query.bool.filter.bool.must.term && body.query.bool.filter.bool.must.term._index)
+          {
+            return body.query.bool.filter.must.term._index;
+          }
+        }
       }
     }
 
