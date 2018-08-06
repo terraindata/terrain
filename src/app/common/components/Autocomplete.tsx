@@ -237,10 +237,6 @@ class Autocomplete extends TerrainComponent<Props>
 
   public handleKeydown(event)
   {
-    if (this.props.onKeyDown)
-    {
-      this.props.onKeyDown(event);
-    }
     if (!this.props.options || (this.props.options && this.props.options.count() === 0))
     {
       // still be able to hit enter when there are no options
@@ -305,6 +301,7 @@ class Autocomplete extends TerrainComponent<Props>
         this.refs['input']['blur']();
         break;
       default:
+        this.props.onKeyDown && this.props.onKeyDown(event);
       // nada
       // this.setState({
       //   selectedIndex: 0,
