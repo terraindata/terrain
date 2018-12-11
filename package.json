@@ -1,9 +1,9 @@
 {
-  "name": "terrain-search",
-  "version": "1.0.0",
-  "description": "The one search front-end to rule them all.",
+  "name": "terrain",
+  "version": "6.1.0",
+  "description": "The one algorithm management system to rule them all.",
   "main": "index.js",
-  "private": true,
+  "license": "See license in LICENSE",
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway-dev",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
