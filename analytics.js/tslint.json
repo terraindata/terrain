@@ -4,6 +4,7 @@
   },
   "extends" : "tslint:recommended",
   "rules" : {
+    "no-trailing-whitespace": [true, "ignore-comments"],
     "max-line-length": [true, 140],
     "quotemark" : [
       true,
