@@ -42,9 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
-// Copyright 2017 Terrain Data, Inc.
-
 // tslint:disable:no-invalid-this restrict-plus-operands radix strict-boolean-expressions no-var-requires only-arrow-functions variable-name max-line-length no-unused-expression no-shadowed-variable
 
 import './HistogramStyle.less';

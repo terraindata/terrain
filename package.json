@@ -3,7 +3,7 @@
   "version": "6.1.0",
   "description": "The one algorithm management system to rule them all.",
   "main": "index.js",
-  "license": "See license in LICENSE",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway-dev",
     "start-minified": "yarn start-postgres && yarn start-midway-minified",
