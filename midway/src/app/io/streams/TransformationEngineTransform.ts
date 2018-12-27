@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import { KeyPath } from 'terrain-keypath';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import TransformationNodeType from '../../../../../shared/transformations/TransformationNodeType';
-import { KeyPath } from '../../../../../shared/util/KeyPath';
 
 import ADocumentTransform from './ADocumentTransform';
 

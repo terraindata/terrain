@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { KeyPath } from './../util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 
 import TransformationNodeVisitor from 'shared/transformations/visitors/TransformationNodeVisitor';
 import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';

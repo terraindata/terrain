@@ -54,7 +54,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import { instanceFnDecorator } from 'shared/util/Classes';
 import { Colors } from 'src/app/colors/Colors';
 
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath } from 'terrain-keypath';
 
 import { List } from 'immutable';
 

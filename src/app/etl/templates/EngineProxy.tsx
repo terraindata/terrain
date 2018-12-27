@@ -55,7 +55,7 @@ import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import * as Utils from 'shared/transformations/util/EngineUtils';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath, WayPoint } from 'terrain-keypath';
 
 /*
  *  Should this file in be /shared?

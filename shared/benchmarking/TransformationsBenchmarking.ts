@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import * as yadeep from 'shared/util/yadeep';
+import * as yadeep from 'yadeep';
 
 /*
  *  Using Date.now() as a placeholder until we figure out an actual package to do benchmarking

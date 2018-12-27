@@ -54,8 +54,8 @@ import * as Utils from 'shared/transformations/util/EngineUtils';
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 import * as TerrainLog from 'loglevel';
 

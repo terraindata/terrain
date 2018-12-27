@@ -49,7 +49,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import TransformationNodeConstructorVisitor from 'shared/transformations/visitors/TransformationNodeConstructorVisitor';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 import { TestDocs } from './TestDocs';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';

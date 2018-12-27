@@ -50,8 +50,8 @@ import * as _ from 'lodash';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';

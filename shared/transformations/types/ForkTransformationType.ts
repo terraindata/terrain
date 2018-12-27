@@ -57,8 +57,8 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 export interface OutputField
 {

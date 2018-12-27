@@ -249,6 +249,7 @@
     "stream-consume": "^0.1.1",
     "strong-soap": "^1.9.0",
     "styled-components": "3.2.6",
+    "terrain-keypath": "^1.0.2",
     "then-request": "^6.0.0",
     "transit-immutable-js": "^0.7.0",
     "transit-js": "^0.8.861",
@@ -265,6 +266,7 @@
     "xml-nodes": "^0.1.5",
     "xml2js": "^0.4.3",
     "xml2json-light": "^1.0.6",
+    "yadeep": "^1.0.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

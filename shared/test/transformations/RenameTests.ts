@@ -47,7 +47,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import { TestDocs } from 'shared/test/transformations/TestDocs';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
 

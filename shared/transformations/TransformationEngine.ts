@@ -52,8 +52,8 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import TransformationNode from 'shared/transformations/TransformationNode';
 import { instanceFnDecorator } from 'shared/util/Classes';
-import { KeyPath } from '../util/KeyPath';
-import * as yadeep from '../util/yadeep';
+import { KeyPath } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 import DataStore from './DataStore';
 import TransformationNodeType, { IdentityTypes, NodeOptionsType, TransformationEdgeTypes as EdgeTypes } from './TransformationNodeType';

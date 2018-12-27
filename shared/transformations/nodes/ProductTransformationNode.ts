@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
+import * as yadeep from 'yadeep';
 
 const { List, Map } = Immutable;
 
@@ -57,7 +57,7 @@ import TransformationNodeInfo from 'shared/transformations/TransformationNodeInf
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 
 import CombineTransformationType from 'shared/transformations/types/CombineTransformationType';
 

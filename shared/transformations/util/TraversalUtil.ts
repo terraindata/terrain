@@ -53,8 +53,8 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import FriendEngine from 'shared/transformations/FriendEngine';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Utils from 'shared/transformations/util/EngineUtils';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 import TransformationNodeType, {
   CommonTransformationOptions,

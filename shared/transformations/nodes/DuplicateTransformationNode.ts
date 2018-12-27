@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as yadeep from 'shared/util/yadeep';
+import * as yadeep from 'yadeep';
 
 const { List, Map } = Immutable;
 
@@ -60,7 +60,7 @@ import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/
 import Topology from 'shared/transformations/util/TopologyUtil';
 import TransformationVisitError from 'shared/transformations/visitors/TransformationVisitError';
 import TransformationVisitResult from 'shared/transformations/visitors/TransformationVisitResult';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 
 import isPrimitive = require('is-primitive');
 

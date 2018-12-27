@@ -3285,6 +3285,13 @@ deep-is@~0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
 
+deep-objectify@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/deep-objectify/-/deep-objectify-1.0.3.tgz#c0515d8c734b70b784ef48f3529557f0f7bb9924"
+  integrity sha512-eb5tSLt+UJ6qlT3u2vLBvzmzZOWbmcjWz3OqD2hHSZGQoThwh3mspv6R9TUeCiDGZ4fH4VzWaoGiia58F1ndpQ==
+  dependencies:
+    is-primitive "^3.0.1"
+
 deepmerge@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-2.1.1.tgz#e862b4e45ea0555072bf51e7fd0d9845170ae768"
@@ -4856,7 +4863,7 @@ image-size@~0.5.0:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.5.5.tgz#09dfd4ab9d20e29eb1c3e80b8990378df9e3cb9c"
 
-immutable@^3.8.2:
+immutable@^3.8.2, immutable@^3.x:
   version "3.8.2"
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.2.tgz#c2439951455bb39913daf281376f1530e104adf3"
 
@@ -6134,6 +6141,11 @@ lodash.uniq@^4.5.0:
 lodash@^4.0.0, lodash@^4.11.1, lodash@^4.13.1, lodash@^4.15.0, lodash@^4.16.2, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.9.0:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
+
+lodash@^4.17.11:
+  version "4.17.11"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
+  integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
 
 log-symbols@^2.1.0:
   version "2.2.0"
@@ -9540,6 +9552,13 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
+terrain-keypath@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/terrain-keypath/-/terrain-keypath-1.0.2.tgz#11e67832f3d8b4f47f97cda7b983a64966b63665"
+  integrity sha512-OKvKBeIe5+QkgZIJpclyrCX732fDeSN1fjGXqdbIu1ofDsi1CVI4WatupoZ7H/exwWLPVpPV1kJHrGe+zzf2TQ==
+  dependencies:
+    immutable "^3.x"
+
 test-exclude@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-4.2.1.tgz#dfa222f03480bca69207ca728b37d74b45f724fa"
@@ -10750,6 +10769,15 @@ y18n@^3.2.1:
 "y18n@^3.2.1 || ^4.0.0", y18n@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.0.tgz#95ef94f85ecc81d007c264e190a120f0a3c8566b"
+
+yadeep@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/yadeep/-/yadeep-1.0.2.tgz#ab5bfbe822236bd0df85f32ab4f4e5ba4d271dd6"
+  integrity sha512-9SKqL1wTK0ccV03ws1+G+hW6KzOEmNZFuDWGjYCr6EjPCKqibZhD6h5zEurk+yywd3yuqB4DYp+Za6GODL4POA==
+  dependencies:
+    deep-objectify "^1.0.3"
+    lodash "^4.17.11"
+    terrain-keypath "^1.0.2"
 
 yallist@^2.1.2:
   version "2.1.2"

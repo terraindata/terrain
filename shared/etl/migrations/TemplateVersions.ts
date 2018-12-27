@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import * as yadeep from 'shared/util/yadeep';
+import * as yadeep from 'yadeep';
 
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -61,7 +61,7 @@ import
   TransformationEngine as V5TransformationEngine,
   TransformationNode as V5Node,
 } from 'shared/transformations/V5TransformationEngine';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 import { convertV5Engine } from './ConvertV5Engine';
 
 export const CURRENT_TEMPLATE_VERSION: TemplateVersion = 'tv5.1';

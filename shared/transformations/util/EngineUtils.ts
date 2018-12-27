@@ -51,7 +51,7 @@ import TransformationsUtil from 'shared/transformations/util/TransformationsUtil
 import TraversalUtil from 'shared/transformations/util/TraversalUtil';
 import TypeUtil from 'shared/transformations/util/TypeUtil';
 import ValidationUtil from 'shared/transformations/util/ValidationUtil';
-import { KeyPathUtil } from 'shared/util/KeyPath';
+import { KeyPathUtil } from 'terrain-keypath';
 
 export { TypeUtil as type };
 export { KeyPathUtil as path };

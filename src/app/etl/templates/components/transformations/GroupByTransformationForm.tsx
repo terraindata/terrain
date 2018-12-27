@@ -63,7 +63,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath } from 'terrain-keypath';
 import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';

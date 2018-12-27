@@ -47,7 +47,7 @@ THE SOFTWARE.
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/transformations/util/TypeUtil';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath, WayPoint } from 'terrain-keypath';
 
 type SimpleType = ReturnType<typeof TypeUtil['getSimpleType']>;
 

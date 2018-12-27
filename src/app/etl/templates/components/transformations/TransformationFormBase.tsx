@@ -56,7 +56,7 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
 import { DynamicForm } from 'common/components/DynamicForm';
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath } from 'terrain-keypath';
 
 import { List } from 'immutable';
 

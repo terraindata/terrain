@@ -47,7 +47,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import { DateFormats, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { CaseFormats } from 'shared/transformations/nodes/CaseTransformationNode';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 
 enum TransformationNodeType
 {

@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 import TransformationNode from 'shared/transformations/TransformationNode';
 import TransformationNodeType, { CommonTransformationOptions, NodeOptionsType } from 'shared/transformations/TransformationNodeType';

@@ -62,7 +62,7 @@ import { TransformationArgs, TransformationForm, TransformationFormProps } from 
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath } from 'terrain-keypath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;

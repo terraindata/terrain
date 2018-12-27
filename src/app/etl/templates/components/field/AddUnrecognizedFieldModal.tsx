@@ -67,13 +67,13 @@ import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { etlFieldTypesList, etlFieldTypesNames, FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath } from 'terrain-keypath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import { TypeTracker } from 'shared/transformations/util/TypeTracker';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';
-import * as yadeep from 'shared/util/yadeep';
+import * as yadeep from 'yadeep';
 
 const ErrorIcon = require('images/icon_info.svg');
 import './EditorFieldModal.less';

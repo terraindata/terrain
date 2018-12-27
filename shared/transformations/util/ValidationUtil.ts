@@ -61,7 +61,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNode from 'shared/transformations/TransformationNode';
 import * as Utils from 'shared/transformations/util/EngineUtils';
 import Topology from 'shared/transformations/util/TopologyUtil';
-import { KeyPath } from 'shared/util/KeyPath';
+import { KeyPath } from 'terrain-keypath';
 
 export interface ValidInfo
 {

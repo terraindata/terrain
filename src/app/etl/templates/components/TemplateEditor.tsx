@@ -82,7 +82,7 @@ import EditorColumnActionsSection from './EditorColumnActionsSection';
 
 import './TemplateEditor.less';
 
-import * as yadeep from 'shared/util/yadeep';
+import * as yadeep from 'yadeep';
 
 const { List } = Immutable;
 

@@ -59,7 +59,7 @@ import TransformationNodeType, {
   NodeOptionsType,
   TransformationEdgeTypes as EdgeTypes,
 } from 'shared/transformations/TransformationNodeType';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath, WayPoint } from 'terrain-keypath';
 
 const etlTypeKeyPath = List(['etlType']);
 type IdentityOptions = NodeOptionsType<TransformationNodeType.IdentityNode>;

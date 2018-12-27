@@ -49,10 +49,10 @@ import * as _ from 'lodash';
 
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 import { TypeTracker } from 'shared/transformations/util/TypeTracker';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
-import { KeyPath, WayPoint } from '../../util/KeyPath';
-import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
 import ConstructionUtil from 'shared/transformations/util/ConstructionUtil';

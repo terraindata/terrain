@@ -56,8 +56,8 @@ import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Utils from 'shared/transformations/util/EngineUtils';
-import { KeyPath } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 import { DefaultController } from './DefaultTemplateController';
 
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';

@@ -60,7 +60,7 @@ import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords'
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import * as Utils from 'shared/transformations/util/EngineUtils';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { KeyPath as EnginePath, WayPoint } from 'terrain-keypath';
 
 const hiddenPath = List(['uiState', 'hidden']);
 export function createFieldMap(engine: TransformationEngine): FieldMap

@@ -52,8 +52,8 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationRegistry from 'shared/transformations/TransformationRegistry';
 
-import { KeyPath, WayPoint } from '../../util/KeyPath';
-import * as yadeep from '../../util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 import { TestDocs } from './TestDocs';
 
 import * as Utils from 'shared/transformations/util/EngineUtils';

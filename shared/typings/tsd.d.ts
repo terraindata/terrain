@@ -42,7 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
 // used to  <reference path="./react/react.d.ts" />
 /// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
 /// <reference path="../../node_modules/moment/moment.d.ts" />

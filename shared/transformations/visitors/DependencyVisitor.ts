@@ -46,8 +46,8 @@ THE SOFTWARE.
 import * as GraphLib from 'graphlib';
 import { List } from 'immutable';
 import * as _ from 'lodash';
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 import { DateFormats, FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import FriendEngine from 'shared/transformations/FriendEngine';

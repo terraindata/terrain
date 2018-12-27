@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import { KeyPath } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
-import { KeyPath } from '../../util/KeyPath';
-import * as yadeep from '../../util/yadeep';
 import { TestDocs } from './TestDocs';
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';

@@ -48,8 +48,8 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { TransformationGraph } from 'shared/transformations/TypedGraph';
 
-import { KeyPath, WayPoint } from 'shared/util/KeyPath';
-import * as yadeep from 'shared/util/yadeep';
+import { KeyPath, WayPoint } from 'terrain-keypath';
+import * as yadeep from 'yadeep';
 
 export type Relation = 'one' | 'many';
 
