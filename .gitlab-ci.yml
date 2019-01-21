@@ -1,4 +1,4 @@
-image:docker.io/terrain/terrain-docker-ci:latest
+image:docker.io/terrain/terrain-docker-ci
 
 variables:
   GIT_SSL_NO_VERIFY: "true"
