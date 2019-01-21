@@ -31,7 +31,7 @@ stages:
 
 lint:
   before_script:
-    - . .monorepo.gitlab/last_green_commit.sh
+    - .monorepo.gitlab/last_green_commit.sh
     - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn lint-parallel
@@ -41,7 +41,7 @@ lint:
 
 diff-style:
   before_script:
-    - . .monorepo.gitlab/last_green_commit.sh
+    - .monorepo.gitlab/last_green_commit.sh
     - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn commit-style
@@ -52,7 +52,7 @@ diff-style:
 
 style:
   before_script:
-    - . .monorepo.gitlab/last_green_commit.sh
+    - .monorepo.gitlab/last_green_commit.sh
     - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn style
@@ -83,7 +83,7 @@ test-backend:
 
 test-sigint:
   before_script:
-    - . .monorepo.gitlab/last_green_commit.sh
+    - .monorepo.gitlab/last_green_commit.sh
   script:
     - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
     - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
@@ -109,7 +109,7 @@ build-frontend:
 
 build-analytics-js:
   before_script:
-    - . .monorepo.gitlab/last_green_commit.sh
+    - .monorepo.gitlab/last_green_commit.sh
   script:
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
@@ -121,9 +121,6 @@ build-analytics-js:
 update-cache:
   stage: style-and-compilation
   script:
-      - pwd
-      - ls
-      - ls .monorepo.gitlab
       - echo "The cache should be updated at the end of this job..."
   cache:
     key: search-node-modules
