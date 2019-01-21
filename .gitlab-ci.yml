@@ -16,8 +16,8 @@ cache:
   policy: pull
 
 before_script:
-  - apt install jq
-  - . .monorepo.gitlab/last_green_commit.sh
+  - cd /builds/DABH/terrain
+  - . ./.monorepo.gitlab/last_green_commit.sh
   - yarn
 
 # Stages defined which groups of jobs run in parallel,
