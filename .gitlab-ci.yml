@@ -1,3 +1,5 @@
+image:docker.io/terrain/terrain-docker-ci:latest
+
 variables:
   GIT_SSL_NO_VERIFY: "true"
   GIT_STRATEGY: "clone"
