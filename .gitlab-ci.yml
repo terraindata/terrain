@@ -3,7 +3,7 @@ variables:
   GIT_STRATEGY: "clone"
   GIT_SUBMODULE_STRATEGY: "recursive"
   GET_SOURCES_ATTEMPTS: "3"
-  CI_SERVER_URL: https://git.terrain.int
+  CI_SERVER_URL: https://gitlab.com
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -14,6 +14,7 @@ cache:
   policy: pull
 
 before_script:
+  - apt install jq
   - . .monorepo.gitlab/last_green_commit.sh
   - yarn
 
