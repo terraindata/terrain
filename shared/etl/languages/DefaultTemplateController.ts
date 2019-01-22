@@ -83,7 +83,7 @@ export class DefaultController implements LanguageInterface
     return [];
   }
 
-  public *getFieldErrors(engine: TransformationEngine, sink, options?)
+  public *getFieldErrors(engine: TransformationEngine, sink, options?): any
   {
     return undefined;
   }
