@@ -52,7 +52,7 @@ import
 } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayType } from 'common/components/DynamicFormTypes';
+import { DisplayType, InputDeclarationType } from 'common/components/DynamicFormTypes';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
@@ -99,7 +99,7 @@ class TaskItem extends TerrainComponent<Props>
         indexResolver: (value) => taskTypeList.indexOf(value),
         displayNames: (s) => taskTypeDisplayNames,
       },
-    },
+    } as any,
   };
 
   public componentWillReceiveProps(nextProps: Props)

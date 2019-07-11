@@ -140,7 +140,7 @@ export class NumericFormBase<NodeType extends TransformationNodeType>
     ).toList();
   }
 
-  protected computeArgs()
+  protected computeArgs(): TransformationArgs<NodeType>
   {
     const { engine, fieldId } = this.props;
     const { otherFieldIds, outputName } = this.state;
@@ -161,7 +161,7 @@ export class NumericFormBase<NodeType extends TransformationNodeType>
         newFieldKeyPaths,
       },
       fields: inputFields,
-    };
+    } as TransformationArgs<NodeType>;
   }
 }
 

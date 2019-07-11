@@ -85,7 +85,7 @@ function recursiveParseFieldProperties(fieldProperty: FieldProperty, fieldProper
     let fieldPropertyChildIds = List<string>();
     _.each((fieldProperty.value as any), (fieldPropertyChildValue, fieldPropertyChildName) =>
     {
-      let fieldPropertyChild = SchemaTypes._FieldProperty({
+      let fieldPropertyChild: FieldProperty = SchemaTypes._FieldProperty({
         name: (fieldPropertyChildName as any) as string,
         value: fieldPropertyChildValue,
         serverId: fieldProperty.serverId,
@@ -118,7 +118,7 @@ export function parseElasticDb(elasticServer: object,
   const isAnalytics = elasticServer['isAnalytics'] !== undefined &&
     elasticServer['isAnalytics'] === true;
 
-  let server = SchemaTypes._Server({
+  let server: Server = SchemaTypes._Server({
     name: elasticServer['name'],
     connectionId: elasticServer['id'],
     isAnalytics,
@@ -133,7 +133,7 @@ export function parseElasticDb(elasticServer: object,
 
   _.each((schemaData as any), (databaseValue, databaseKey) =>
   {
-    let database = SchemaTypes._Database({
+    let database: Database = SchemaTypes._Database({
       name: databaseKey.toString(),
       serverId: serverId as string,
     });
@@ -221,7 +221,7 @@ export function parseElasticDb(elasticServer: object,
 
               _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName) =>
               {
-                let fieldProperty = SchemaTypes._FieldProperty({
+                let fieldProperty: FieldProperty = SchemaTypes._FieldProperty({
                   name: (fieldPropertyName as any) as string,
                   value: fieldPropertyValue,
                   serverId,
@@ -239,7 +239,7 @@ export function parseElasticDb(elasticServer: object,
                 fieldPropertyIds = fieldPropertyIds.push(fieldProperty.id);
               });
 
-              let column = SchemaTypes._Column({
+              let column: Column = SchemaTypes._Column({
                 name: (fieldName as any) as string,
                 serverId,
                 databaseId,

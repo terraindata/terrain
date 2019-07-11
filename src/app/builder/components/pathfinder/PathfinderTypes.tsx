@@ -138,7 +138,7 @@ class PathC extends BaseClass
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
 {
-  let path = New<Path>(new PathC(config || {}), config);
+  let path: Path = New<Path>(new PathC(config || {}), config);
   path = path.set('source', _Source(path.source));
   path = path.set('filterGroup', _FilterGroup(path.filterGroup));
   path = path.set('softFilterGroup', _FilterGroup(path.softFilterGroup));
@@ -162,7 +162,7 @@ export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
 export const _FilterGroup = (config?: { [key: string]: any }) =>
 {
   config = Util.extendId(config);
-  let filterGroup = New<FilterGroup>(new FilterGroupC(config), config);
+  let filterGroup: FilterGroup = New<FilterGroup>(new FilterGroupC(config), config);
   filterGroup = filterGroup.set('lines',
     List(filterGroup.lines.map((line) => _FilterLine(line))));
   return filterGroup;
@@ -212,7 +212,7 @@ class ScoreC extends BaseClass
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>
 {
-  let score = New<Score>(new ScoreC(config || {}), config);
+  let score: Score = New<Score>(new ScoreC(config || {}), config);
   score = score
     .set('lines', List(score['lines'].map((line) => _ScoreLine(line))));
   return score;
@@ -238,7 +238,7 @@ class ScoreLineC extends LineC
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
 export const _ScoreLine = (config?: { [key: string]: any }) =>
 {
-  let scoreLine = New<ScoreLine>(new ScoreLineC(config), config);
+  let scoreLine: ScoreLine = New<ScoreLine>(new ScoreLineC(config), config);
   if (config && config.weight !== undefined)
   {
     scoreLine = scoreLine.set('weight', config.weight);
@@ -264,7 +264,7 @@ class TransformDataC extends BaseClass
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
 export const _TransformData = (config?: { [key: string]: any }) =>
 {
-  let transform = New<TransformData>(new TransformDataC(config), config);
+  let transform: TransformData = New<TransformData>(new TransformDataC(config), config);
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
     .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
@@ -304,7 +304,7 @@ class MoreC extends BaseClass
 export type More = MoreC & IRecord<MoreC>;
 export const _More = (config?: { [key: string]: any }) =>
 {
-  let more = New<More>(new MoreC(config || {}), config);
+  let more: More = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
     .set('scripts', List(more['scripts'].map((agg) => _Script(agg))))
@@ -333,7 +333,7 @@ class AggregationLineC extends BaseClass
 export type AggregationLine = AggregationLineC & IRecord<AggregationLineC>;
 export const _AggregationLine = (config?: { [key: string]: any }) =>
 {
-  let aggregation = New<AggregationLine>(new AggregationLineC(config || {}), config);
+  let aggregation: AggregationLine = New<AggregationLine>(new AggregationLineC(config || {}), config);
   const advanced = {};
   _.keys(aggregation['advanced']).map((key) =>
   {
@@ -382,7 +382,7 @@ class ScriptC extends BaseClass
 export type Script = ScriptC & IRecord<ScriptC>;
 export const _Script = (config?: { [key: string]: any }) =>
 {
-  let script = New<Script>(new ScriptC(Util.asJS(config)), Util.asJS(config));
+  let script: Script = New<Script>(new ScriptC(Util.asJS(config)), Util.asJS(config));
   script = script.set('params', List(script.params.map((param) => _Param(param))));
   return script;
 };
@@ -416,7 +416,7 @@ export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
 {
   config = Util.extendId(Util.asJS(config));
-  let filterLine = New<FilterLine>(new FilterLineC(Util.asJS(config)), Util.asJS(config));
+  let filterLine: FilterLine = New<FilterLine>(new FilterLineC(Util.asJS(config)), Util.asJS(config));
   if (config && config.filterGroup !== null && config.filterGroup !== undefined)
   {
     filterLine = filterLine.set('filterGroup', _FilterGroup(config.filterGroup));
@@ -526,7 +526,7 @@ class SourceC extends BaseClass
 export type Source = SourceC & IRecord<SourceC>;
 export const _Source = (config?: { [key: string]: any }) =>
 {
-  let source = New<Source>(new SourceC(config), config);
+  let source: Source = New<Source>(new SourceC(config), config);
   source = source.set('dataSource', _ElasticDataSource(source.dataSource));
   return source;
 };
@@ -894,7 +894,7 @@ class ElasticDataSourceC extends DataSource
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
 {
-  let elasticSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
+  let elasticSource: ElasticDataSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
   elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };

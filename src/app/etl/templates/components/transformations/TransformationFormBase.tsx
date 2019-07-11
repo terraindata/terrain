@@ -170,7 +170,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
       transformation.fields.map((field) => field.path).toList();
 
     return {
-      options: this.state,
+      options: this.state as any,
       fields,
     };
   }

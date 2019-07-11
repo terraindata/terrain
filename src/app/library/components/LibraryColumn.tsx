@@ -61,6 +61,7 @@ export interface Props
   index: number;
   title: string;
   referrer?: { label: string, path: string };
+  children?: any; // HACK -- this should be provided by React, not by us!?
 }
 
 const COLUMN_STYLE = _.extend({},

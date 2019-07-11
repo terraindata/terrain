@@ -402,7 +402,7 @@ export default class MagentoEndpoint extends AEndpointStream
     return controller;
   }
 
-  private async _getWSDLAsJSON(params, options)
+  private async _getWSDLAsJSON(params, options): Promise<any>
   {
     return new Promise(async (resolve, reject) =>
     {
@@ -575,7 +575,7 @@ export default class MagentoEndpoint extends AEndpointStream
     });
   }
 
-  private async _soapCall(route: string, host: string, data?: any)
+  private async _soapCall(route: string, host: string, data?: any): Promise<any>
   {
     return new Promise(async (resolve, reject) =>
     {

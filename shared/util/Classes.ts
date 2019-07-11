@@ -304,7 +304,7 @@ export function instanceFnDecorator(fnToApply, ...extraArgs)
 
 // boilerplate generator
 export type WithIRecord<T> = T & IRecord<T>;
-export function makeConstructor<T>(Type: { new(): T; }): (config?: ConfigType<T>) => WithIRecord<T>
+export function makeConstructor<T>(Type: new() => T): (config?: ConfigType<T>) => WithIRecord<T>
 {
   return (config?: { [key: string]: any }) =>
     New<WithIRecord<T>>(new Type(), config);
@@ -340,7 +340,7 @@ export type ConfigTransformer<T> = (config?: ConfigType<T>, deep?: boolean) => C
  * A config transformer can also be passed, which is a function that transforms a config into a config of the same type.
  */
 export function makeExtendedConstructor<T>(
-  Type: { new(): T; },
+  Type: new() => T,
   injectMethods: boolean = false,
   deepConfigOverride?: overrideMap<T>,
   transformConfig?: ConfigTransformer<T>,

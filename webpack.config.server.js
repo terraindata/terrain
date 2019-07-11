@@ -112,7 +112,7 @@ module.exports = (env, argv) =>
     },
 
     plugins: [
-      new ForkTsCheckerWebpackPlugin({ tslint: true, tsconfig: './midway/tsconfig.json', checkSyntacticErrors: true, workers: 2 }),
+      new ForkTsCheckerWebpackPlugin({ tslint: true, tsconfig: './midway/tsconfig.json', checkSyntacticErrors: true, workers: 1 }),
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify(mode),

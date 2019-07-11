@@ -100,7 +100,7 @@ export class AlgorithmSelectorUncontained extends TerrainComponent<Props>
         displayNames: (state) => this.state.categoryNames,
         indexResolver: (state) => this.state.categories.indexOf(state),
       },
-    },
+    } as any,
     group: {
       type: DisplayType.Pick,
       displayName: 'Group',
@@ -109,7 +109,7 @@ export class AlgorithmSelectorUncontained extends TerrainComponent<Props>
         displayNames: (state) => this.state.groupNames,
         indexResolver: (state) => this.state.groups.indexOf(state),
       },
-    },
+    } as any,
     algorithm: {
       type: DisplayType.Pick,
       displayName: 'Algorithm',
@@ -118,7 +118,7 @@ export class AlgorithmSelectorUncontained extends TerrainComponent<Props>
         displayNames: (state) => this.state.algorithmNames,
         indexResolver: (state) => this.state.algorithms.indexOf(state),
       },
-    },
+    } as any,
   };
 
   public componentDidMount()

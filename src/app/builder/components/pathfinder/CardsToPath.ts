@@ -690,7 +690,7 @@ export class CardsToPath
           if (query.objectChildren.bool)
           {
             // create filter group
-            let newFilterGroup = _FilterGroup();
+            let newFilterGroup: FilterGroup = _FilterGroup();
             const boolValueInfo = query.objectChildren.bool.propertyValue;
             newFilterGroup = this.BoolToFilterGroup(newFilterGroup, parser, boolValueInfo, sectionType, true);
             newLines.push(_FilterLine().set('filterGroup', newFilterGroup));

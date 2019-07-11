@@ -164,7 +164,7 @@ module.exports =
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
     }),
-    new ForkTsCheckerWebpackPlugin({ tslint: true, checkSyntacticErrors: true, workers: 2 }),
+    new ForkTsCheckerWebpackPlugin({ tslint: true, checkSyntacticErrors: true, workers: 1 }),
     // new BundleAnalyzerPlugin(),
     new CompressionPlugin({
       asset: "[path].gz[query]",
