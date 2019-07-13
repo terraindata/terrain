@@ -57,7 +57,7 @@ export default abstract class TransformationNodeInfo
 
   public abstract humanName: string;
   public abstract description: string;
-  public abstract nodeClass: new(...args: any[]) => TransformationNode;
+  public abstract nodeClass: new (...args: any[]) => TransformationNode;
 
   public editable: boolean = false;
   public creatable: boolean = false;

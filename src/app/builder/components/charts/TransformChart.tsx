@@ -560,10 +560,10 @@ const TransformChart = {
       {
         return TransformChart._roundedRect
           (scales.realX(d['range']['min']) + xPadding,
-          scales.realBarY(d['percentage']),
-          Math.max(1, scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding),
-          scaleMin(scales.realBarY) - scales.realBarY(d['percentage']),
-          radius);
+            scales.realBarY(d['percentage']),
+            Math.max(1, scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding),
+            scaleMin(scales.realBarY) - scales.realBarY(d['percentage']),
+            radius);
       })
       .attr('fill', colors[0])
       ;
@@ -620,7 +620,7 @@ const TransformChart = {
           .filter((d) => d['fields'][inputKey] !== undefined)
           .sort((d, b) => d['rank'] - b['rank']),
         (d) => d['fields']['_id'],
-    );
+      );
     const spotlightEnter = spotlight.enter()
       .append('g')
       .attr('class', 'spotlight')

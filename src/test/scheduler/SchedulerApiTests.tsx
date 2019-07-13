@@ -73,7 +73,7 @@ describe('SchedulerApi', () =>
             { id: 1, name: 'schedule' },
           );
         },
-      );
+        );
     });
   });
 
@@ -93,7 +93,7 @@ describe('SchedulerApi', () =>
             [{ id: 1 }, { id: 2 }],
           );
         },
-      );
+        );
     });
   });
 
@@ -113,7 +113,7 @@ describe('SchedulerApi', () =>
             { id: 1 },
           );
         },
-      );
+        );
     });
   });
 
@@ -133,7 +133,7 @@ describe('SchedulerApi', () =>
             { id: 1, name: 'modified' },
           );
         },
-      );
+        );
     });
   });
 
@@ -153,7 +153,7 @@ describe('SchedulerApi', () =>
             { id: 1 },
           );
         },
-      );
+        );
     });
   });
 
@@ -173,7 +173,7 @@ describe('SchedulerApi', () =>
             { id: 2 },
           );
         },
-      );
+        );
     });
   });
 
@@ -193,7 +193,7 @@ describe('SchedulerApi', () =>
             [{ id: 1 }],
           );
         },
-      );
+        );
     });
   });
 
@@ -213,7 +213,7 @@ describe('SchedulerApi', () =>
             { id: 1 },
           );
         },
-      );
+        );
     });
   });
 
@@ -233,7 +233,7 @@ describe('SchedulerApi', () =>
             { id: 1 },
           );
         },
-      );
+        );
     });
   });
 
@@ -253,7 +253,7 @@ describe('SchedulerApi', () =>
             { id: 1 },
           );
         },
-      );
+        );
     });
   });
 
@@ -273,7 +273,7 @@ describe('SchedulerApi', () =>
             { id: 1, shouldRunNext: false },
           );
         },
-      );
+        );
     });
   });
 });

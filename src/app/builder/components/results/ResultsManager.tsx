@@ -816,19 +816,19 @@ export class ResultsManager extends TerrainComponent<Props>
         .set(
           isAllFields ? 'hasAllFieldsError' : 'hasError',
           true,
-      )
+        )
         .set(
           isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
           errorMessage,
-      )
+        )
         .set(
           isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
           true,
-      )
+        )
         .set(
           'loading',
           false,
-      ),
+        ),
     );
   }
 
@@ -853,19 +853,19 @@ export class ResultsManager extends TerrainComponent<Props>
         .set(
           isAllFields ? 'hasAllFieldsError' : 'hasError',
           true,
-      )
+        )
         .set(
           isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
           err.title,
-      )
+        )
         .set(
           isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
           true,
-      )
+        )
         .set(
           'loading',
           false,
-      ),
+        ),
     );
   }
 

@@ -239,10 +239,10 @@ const BuilderReducers =
 
         return arr.splice
           (
-          action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
-          0,
-          item,
-        );
+            action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
+            0,
+            item,
+          );
       },
     )
   ,
@@ -271,10 +271,10 @@ const BuilderReducers =
 
         return arr.splice
           (
-          action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
-          0,
-          item,
-        );
+            action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
+            0,
+            item,
+          );
       },
     )
   ,
@@ -450,7 +450,7 @@ const BuilderReducers =
       .update('query',
         (query) =>
           query.set('resultsConfig', action.payload.resultsConfig),
-    ),
+      ),
 
   [ActionTypes.save]: (state: BuilderState,
     action: Action<{

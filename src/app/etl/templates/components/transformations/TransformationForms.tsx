@@ -70,7 +70,7 @@ import
 import { SplitTFF } from './SplitTransformationForm';
 import { StringifyTFF } from './StringifyTransformationForm';
 
-const forms: Array<new(props) => TransformationForm<any, any>> = [
+const forms: Array<new (props) => TransformationForm<any, any>> = [
   AddTFF,
   CaseTFF,
   CastTFF,
@@ -120,7 +120,7 @@ class TransformationFormVisitor extends TransformationNodeVisitor<FormClass>
     return null;
   }
 
-  private addToVisitors(formClass: new(props) => any)
+  private addToVisitors(formClass: new (props) => any)
   {
     const instance = new formClass({});
     this.visitorLookup[instance.type] = () => formClass;
