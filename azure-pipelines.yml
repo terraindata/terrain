@@ -7,9 +7,9 @@ pr:
   - releases/*
 
 stages:
-- stage: style-and-compilation
+- stage: style_and_compilation
   jobs:
-  - job: 
+  - job: diff_style
     strategy:
       matrix:
         linux:
@@ -30,8 +30,8 @@ stages:
           yarn
           yarn add npm-run-all tslint typescript-formatter
           yarn commit-style
-        displayName: 'diff-style'
-  - job: 
+        displayName: 'diff_style'
+  - job: lint
     strategy:
       matrix:
         linux:
@@ -54,7 +54,7 @@ stages:
           yarn add npm-run-all tslint typescript-formatter
           yarn style
         displayName: 'lint'
-  - job: 
+  - job: build_analytics_js
     strategy:
       matrix:
         linux:
@@ -76,7 +76,7 @@ stages:
           yarn
           yarn build
         displayName: 'Build analytics.js'
-  - job: 
+  - job: build_backend
     strategy:
       matrix:
         linux:
@@ -97,7 +97,7 @@ stages:
           yarn
           yarn build-server
         displayName: 'Build backend'
-  - job: 
+  - job: build_frontend
     strategy:
       matrix:
         linux:
@@ -119,9 +119,9 @@ stages:
           yarn
           yarn build
         displayName: 'Build frontend'
-- stage: standard-tests
+- stage: standard_tests
   jobs:
-  - job: test-sigint
+  - job: test_sigint
     strategy:
       matrix:
         linux:
@@ -144,7 +144,7 @@ stages:
           yarn
           yarn test
         displayName: 'Test SigInt'
-  - job: test-frontend
+  - job: test_frontend
     strategy:
       matrix:
         linux:
@@ -165,7 +165,7 @@ stages:
           yarn
           yarn test-front
         displayName: 'Test frontend'
-  - job: test-backend
+  - job: test_backend
     strategy:
       matrix:
         linux:
@@ -187,7 +187,7 @@ stages:
           timeout 240 yarn test-back-setup
           yarn test-back
         displayName: 'Test backend'
-  - job: fullstack-meta
+  - job: fullstack_meta
     strategy:
       matrix:
         linux:
