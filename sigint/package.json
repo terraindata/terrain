@@ -28,7 +28,7 @@
   ],
   "jest": {
     "transform": {
-      ".ts": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".ts": "ts-jest"
     },
     "testRegex": "/test/.+Tests\\.ts$",
     "moduleFileExtensions": [
@@ -39,7 +39,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "enableTsDiagnostics": true
+	"diagnostics": true
       },
       "DEV": true
     },
@@ -50,39 +50,39 @@
     "url": "https://api.terraindata.com/sigint/v1"
   },
   "dependencies": {
-    "command-line-args": "^5.0.2",
-    "command-line-usage": "^5.0.5",
-    "date-format": "^1.2.0",
+    "command-line-args": "^5.1.1",
+    "command-line-usage": "^6.0.2",
+    "date-format": "^2.0.0",
     "elasticsearch": "^15.1.1",
     "jsurl": "^0.1.5",
     "kcors": "^2.2.2",
-    "koa": "^2.5.2",
+    "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-logger-winston": "^0.0.2",
-    "koa-response-time": "^2.0.0",
+    "koa-response-time": "^2.1.0",
     "koa-router": "^7.4.0",
-    "koa-static-server": "^1.3.4",
-    "lodash": "^4.17.10",
+    "koa-static-server": "^1.4.0",
+    "lodash": "^4.17.14",
     "string-hash": "^1.1.3",
-    "winston": "^3.0.0"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@types/elasticsearch": "^5.0.25",
-    "@types/jest": "^23.3.1",
-    "@types/koa": "^2.0.46",
-    "@types/node": "^10.5.5",
-    "apidoc": "^0.17.6",
+    "@types/elasticsearch": "^5.0.34",
+    "@types/jest": "^24.0.15",
+    "@types/koa": "^2.0.49",
+    "@types/node": "^12.6.2",
+    "apidoc": "^0.17.7",
     "babel-core": "^6.26.3",
     "bench-rest": "^1.2.4",
-    "jest": "^23.4.2",
-    "nodemon": "^1.18.3",
-    "supertest": "^3.1.0",
-    "ts-jest": "^23.0.1",
-    "ts-loader": "^4.4.2",
-    "ts-node": "^7.0.0",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.1",
+    "jest": "^24.8.0",
+    "nodemon": "^1.19.1",
+    "supertest": "^4.0.2",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^6.0.4",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3",
     "typescript-formatter": "^7.2.2",
-    "webpack": "^4.16.3"
+    "webpack": "^4.35.3"
   }
 }
