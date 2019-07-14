@@ -20,10 +20,7 @@ cache:
   policy: pull
 
 before_script:
-  - docker info
   - cd /builds/DABH/terrain
-  - ls
-  - ls .monorepo.gitlab
   - .monorepo.gitlab/last_green_commit.sh
   - yarn
 
