@@ -7,9 +7,9 @@ pr:
   - releases/*
 
 stages:
-- stage: Standard_Tests
+- stage: style-and-compilation
   jobs:
-  - job: Test_SigInt
+  - job: 
     strategy:
       matrix:
         linux:
@@ -27,8 +27,189 @@ stages:
           echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
           sudo apt update
           sudo apt install --no-install-recommends yarn
-          yarn test-sigint-setup
+          yarn
+          yarn add npm-run-all tslint typescript-formatter
+          yarn commit-style
+        displayName: 'diff-style'
+  - job: 
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          cd analytics.js
+          yarn
+          yarn add npm-run-all tslint typescript-formatter
+          yarn style
+        displayName: 'lint'
+  - job: 
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          cd analytics.js
+          yarn
+          yarn build
+        displayName: 'Build analytics.js'
+  - job: 
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          yarn
+          yarn build-server
+        displayName: 'Build backend'
+  - job: 
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          cd analytics.js
+          yarn
+          yarn build
+        displayName: 'Build frontend'
+- stage: standard-tests
+  jobs:
+  - job: test-sigint
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          timeout 240 yarn test-sigint-setup
           cd sigint
           yarn
           yarn test
         displayName: 'Test SigInt'
+  - job: test-frontend
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          yarn
+          yarn test-front
+        displayName: 'Test frontend'
+  - job: test-backend
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          yarn
+          timeout 240 yarn test-back-setup
+          yarn test-back
+        displayName: 'Test backend'
+  - job: fullstack-meta
+    strategy:
+      matrix:
+        linux:
+          imageName: "ubuntu-16.04"
+      maxParallel: 3
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+      - script: |
+          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install --no-install-recommends yarn
+          yarn
+          timeout 240 yarn test-fullstack-setup
+          yarn clean
+          yarn build
+          NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
+          sleep 25
+          yarn test-fullstack-component
+        displayName: 'Fullstack tests'
