@@ -161,7 +161,6 @@ stages:
           sudo apt update
           sudo apt install --no-install-recommends yarn
           export TZ=America/Los_Angeles
-          sudo unlink /etc/timezone ; sudo cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && sudo echo America/Los_Angeles > /etc/timezone
           yarn
           yarn test-front
         displayName: 'Test frontend'
@@ -184,7 +183,6 @@ stages:
           sudo apt update
           sudo apt install --no-install-recommends yarn
           export TZ=America/Los_Angeles
-          sudo unlink /etc/timezone ; sudo cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && sudo echo America/Los_Angeles > /etc/timezone
           yarn
           timeout 240 yarn test-back-setup
           yarn test-back
@@ -208,7 +206,6 @@ stages:
           sudo apt update
           sudo apt install --no-install-recommends yarn
           export TZ=America/Los_Angeles
-          sudo unlink /etc/timezone ; sudo cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && sudo echo America/Los_Angeles > /etc/timezone
           sudo service postgresql stop
           yarn
           timeout 240 yarn test-fullstack-setup
