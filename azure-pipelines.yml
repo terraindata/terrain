@@ -16,13 +16,12 @@ strategy:
  #     imageName: "vs2017-win2016"
   maxParallel: 3
 
-pool:
-  vmImage: $(imageName)
-
 stages:
 - stage: A
   jobs:
   - job: A1
+    pool:
+      vmImage: $(imageName)
     steps:
       - script: |
           echo Hello, world!
