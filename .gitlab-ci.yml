@@ -37,7 +37,6 @@ stages:
 lint:
   before_script:
     - .monorepo.gitlab/last_green_commit.sh
-    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn lint-parallel
   except:
@@ -47,7 +46,6 @@ lint:
 diff-style:
   before_script:
     - .monorepo.gitlab/last_green_commit.sh
-    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn commit-style
   stage: style-and-compilation
@@ -58,7 +56,6 @@ diff-style:
 style:
   before_script:
     - .monorepo.gitlab/last_green_commit.sh
-    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn style
   stage: style-and-compilation
