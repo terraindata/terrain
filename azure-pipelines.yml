@@ -7,9 +7,9 @@ pr:
   - releases/*
 
 stages:
-- stage: Standard Tests
+- stage: Standard_Tests
   jobs:
-  - job: Test SigInt
+  - job: Test_SigInt
     strategy:
       matrix:
         linux:
