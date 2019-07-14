@@ -27,11 +27,8 @@ stages:
           echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
           sudo apt update
           sudo apt install --no-install-recommends yarn
-          ls
-          pwd
-          yarn
           yarn test-sigint-setup
           cd sigint
+          yarn
           yarn test
-          cd ..
         displayName: 'Test SigInt'
