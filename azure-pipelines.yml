@@ -1,0 +1,31 @@
+trigger:
+  - master
+  - releases/*
+
+pr:
+  - master
+  - releases/*
+
+strategy:
+  matrix:
+    linux:
+      imageName: "ubuntu-16.04"
+ #   mac:
+ #     imageName: "macos-10.13"
+ #   windows:
+ #     imageName: "vs2017-win2016"
+  maxParallel: 3
+
+pool:
+  vmImage: $(imageName)
+
+stages:
+- stage: A
+  jobs:
+  - job: A1
+    steps:
+      - script: |
+          echo Hello, world!
+          echo Add other tasks to build, test, and deploy your project.
+          echo See https://aka.ms/yaml
+        displayName: 'Run a one-line script'
