@@ -19,8 +19,8 @@ stages:
       vmImage: $(imageName)
     steps:
       - task: NodeTool@0
-          inputs:
-            versionSpec: '10.x'
+        inputs:
+          versionSpec: '10.x'
       - script: |
           sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
           curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
