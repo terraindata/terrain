@@ -21,12 +21,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
           yarn
           yarn add npm-run-all tslint typescript-formatter
           yarn commit-style
@@ -43,12 +39,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
           yarn
           yarn add npm-run-all tslint typescript-formatter
           yarn style
@@ -65,12 +57,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
           cd analytics.js
           yarn
           yarn build
@@ -87,12 +75,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
           yarn
           yarn build-server
         displayName: 'Build backend'
@@ -108,12 +92,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
           yarn
           yarn build
         displayName: 'Build frontend'
@@ -131,12 +111,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
           timeout 240 yarn test-sigint-setup
           cd sigint
           yarn
@@ -154,13 +130,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
-          export TZ=America/Los_Angeles
           yarn
           yarn test-front
         displayName: 'Test frontend'
@@ -176,13 +147,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
-          export TZ=America/Los_Angeles
           yarn
           timeout 240 yarn test-back-setup
           yarn test-back
@@ -199,14 +165,8 @@ stages:
       - task: NodeTool@0
         inputs:
           versionSpec: '10.x'
+      - template: ci_templates/linux_setup.yml
       - script: |
-          sudo apt install -y curl wget gnupg jq parallel python-minimal postgresql
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install --no-install-recommends yarn
-          export TZ=America/Los_Angeles
-          sudo service postgresql stop
           yarn
           timeout 240 yarn test-fullstack-setup
           yarn clean
