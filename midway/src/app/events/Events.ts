@@ -110,7 +110,7 @@ export class Events
         {
           interval: request.interval,
         },
-    );
+      );
     return this.buildQuery(controller, body.build());
   }
 
@@ -181,7 +181,7 @@ export class Events
               'eventname.keyword',
               'count',
             ),
-        )
+          )
           .aggregation(
             'bucket_script',
             undefined,
@@ -193,7 +193,7 @@ export class Events
               script: 'params.' + numerator + ' / params.' + denominator,
             },
             rate),
-    );
+      );
 
     return this.buildQuery(controller, body.build());
   }
