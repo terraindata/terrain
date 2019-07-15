@@ -6,6 +6,9 @@ pr:
   - master
   - releases/*
 
+variables:
+  TZ: America/Los_Angeles
+
 stages:
 - stage: style_and_compilation
   jobs:
