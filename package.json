@@ -66,7 +66,7 @@
   ],
   "jest": {
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "ts-jest"
     },
     "testPathIgnorePatterns": [
       "node_modules",
@@ -117,7 +117,9 @@
     "setupFiles": [
       "<rootDir>/src/test/__mocks__/browserMock.ts"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/src/test/setup.ts",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/test/setup.ts"
+    ],
     "testURL": "http://localhost",
     "clearMocks": true
   },
@@ -195,7 +197,7 @@
     "passport-local": "^1.0.0",
     "pg": "^7.11.0",
     "pg-error-constants": "^1.0.0",
-    "pg-query-stream": "^1.1.1",
+    "pg-query-stream": "^2.0.0",
     "promise-queue": "^2.2.3",
     "prop-types": "^15.6.1",
     "puppeteer": "1.4.0",
