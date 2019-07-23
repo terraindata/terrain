@@ -247,7 +247,7 @@ const generalProcessors: {
                 });
               }
             },
-        ));
+          ));
 
       let cards = List([]);
       if (tables.length)

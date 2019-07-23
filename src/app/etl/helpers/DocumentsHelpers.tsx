@@ -240,7 +240,7 @@ class DocumentsHelpers extends ETLHelpers
       const reader = new FileReader();
       reader.onload = (event) =>
       {
-        resolve(event.target.result);
+        resolve(event.target['result']);
       };
       reader.onerror = (reason) => reject(reason);
       reader.readAsText(slice);

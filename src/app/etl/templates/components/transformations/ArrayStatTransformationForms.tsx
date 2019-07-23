@@ -87,7 +87,7 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
     };
     protected readonly type = type;
 
-    protected computeArgs()
+    protected computeArgs(): TransformationArgs<T>
     {
       const { engine, fieldId } = this.props;
       const { outputName } = this.state;
@@ -104,7 +104,7 @@ function SimpleStatFactory<T extends TransformationNodeType>(type: T, startingNa
           newFieldKeyPaths,
         },
         fields: inputFields,
-      };
+      } as TransformationArgs<T>;
     }
   };
 }

@@ -124,7 +124,7 @@ class LibraryStateMock
       .setIn(
         ['categories', categoryId, 'groupsOrder'],
         this.state.categories.get(categoryId).groupsOrder.push(groupId),
-    );
+      );
 
     return this;
   }
@@ -143,7 +143,7 @@ class LibraryStateMock
       .setIn(
         ['groups', groupId, 'algorithmsOrder'],
         this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
-    );
+      );
 
     return this;
   }

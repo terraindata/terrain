@@ -125,7 +125,7 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
       },
       setEndpointOptions: (state, action) =>
       {
-        let newState = state;
+        let newState: any = state;
         const { sourceOptions, sinkOptions } = action.payload;
         if (sourceOptions != null)
         {

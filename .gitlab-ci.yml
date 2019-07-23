@@ -5,6 +5,11 @@ variables:
   GIT_STRATEGY: "clone"
   GIT_SUBMODULE_STRATEGY: "recursive"
   GET_SOURCES_ATTEMPTS: "3"
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:dind
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -32,7 +37,6 @@ stages:
 lint:
   before_script:
     - .monorepo.gitlab/last_green_commit.sh
-    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn lint-parallel
   except:
@@ -42,7 +46,6 @@ lint:
 diff-style:
   before_script:
     - .monorepo.gitlab/last_green_commit.sh
-    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn commit-style
   stage: style-and-compilation
@@ -53,7 +56,6 @@ diff-style:
 style:
   before_script:
     - .monorepo.gitlab/last_green_commit.sh
-    - yarn add npm-run-all tslint typescript-formatter
   script:
    - yarn style
   stage: style-and-compilation

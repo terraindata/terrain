@@ -65,7 +65,7 @@ function updateObject<T>(obj: T, newObj: T): T
 {
   for (const key in newObj)
   {
-    if (newObj.hasOwnProperty(key))
+    if ((newObj as any).hasOwnProperty(key))
     {
       obj[key] = newObj[key];
     }

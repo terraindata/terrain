@@ -55,7 +55,7 @@ const removeItem = (state: LibraryState, id: ID, parentKeyPath: Array<string | I
   state.removeIn([type, id])
     .updateIn(parentKeyPath.concat([type + 'Order']), (order) =>
       order.filter((value) => value !== id),
-  );
+    );
 
 const removeAlgorithm = (state: LibraryState, algorithm) =>
   removeItem(state, algorithm.id, ['groups', algorithm.groupId], 'algorithms');
@@ -215,7 +215,7 @@ LibraryReducers[ActionTypes.algorithms.status] =
       .updateIn(
         ['algorithms', algorithm.id],
         (v) => v.set('status', status),
-    )
+      )
       .set('changingStatus', false);
   };
 

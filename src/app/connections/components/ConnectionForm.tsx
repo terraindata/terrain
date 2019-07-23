@@ -72,6 +72,7 @@ export type ConnectionFormConfig = SharedConnectionConfig & {
   user: string,
   password: string,
   port: number,
+  analytics: boolean,
 };
 
 const ConnectionTypes = Map(

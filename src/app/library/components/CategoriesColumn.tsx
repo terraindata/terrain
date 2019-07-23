@@ -266,7 +266,7 @@ class CategoriesColumn extends TerrainComponent<Props>
                           (categoryRoles.getIn([role.userId, 'builder']) ? 'Builder' : 'Viewer')
                       }
                     />,
-            )
+              )
           }
         </div>
       </LibraryItem>

@@ -85,7 +85,7 @@ export default class IntegrationPicker extends TerrainComponent<Props>
         displayNames: (s) => this.state.filteredIntegrations.map((i) => i.name),
         textColor: (index) => this.state.integrationIds.get(index) === 'custom' ? Colors().active : '',
       },
-    },
+    } as any,
   };
 
   public componentDidMount()
