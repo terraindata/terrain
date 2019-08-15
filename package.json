@@ -365,10 +365,10 @@
     "typescript": "^3.5.3",
     "typescript-formatter": "^7.2.2",
     "url-loader": "^1.0.1",
-    "webpack": "^4.35.3",
-    "webpack-bundle-analyzer": "^2.13.1",
+    "webpack": "^4.39.2",
+    "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.3.6",
-    "webpack-dev-server": "^3.7.2",
+    "webpack-dev-server": "^3.8.0",
     "webpack-node-externals": "^1.7.2",
     "yarn-run-all": "^3.1.1"
   },
