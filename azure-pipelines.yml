@@ -177,5 +177,4 @@ stages:
           NODE_ENV=production nohup yarn start-midway-prod > ./midwayConsole.log < /dev/null 2>&1&
           sleep 25
           yarn test-fullstack-component
-          cat ./midwayConsole.log
         displayName: 'Fullstack tests'
