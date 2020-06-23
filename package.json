@@ -164,7 +164,7 @@
     "is-primitive": "^3.0.1",
     "javascript-natural-sort": "^0.7.1",
     "jest-image-snapshot": "^2.9.0",
-    "jquery": "^3.2.1",
+    "jquery": "^3.5.0",
     "js-sha3": "^0.8.0",
     "json-file": "^0.1.0",
     "json-immutable": "^0.4.0",
