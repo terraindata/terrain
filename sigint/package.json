@@ -62,7 +62,7 @@
     "koa-response-time": "^2.1.0",
     "koa-router": "^7.4.0",
     "koa-static-server": "^1.4.0",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.19",
     "string-hash": "^1.1.3",
     "winston": "^3.2.1"
   },
