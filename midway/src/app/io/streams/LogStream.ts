@@ -116,7 +116,7 @@ export default class LogStream extends Readable
       logMsg.message = chunk;
     }
 
-    return super.push(JSON.stringify(logMsg), encoding);
+    return super.push(JSON.stringify(logMsg), encoding as BufferEncoding);
   }
 
   public addStream(stream: Readable | Writable | Transform)

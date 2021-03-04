@@ -63,7 +63,7 @@ export class SafeWritable extends Writable
   {
     try
     {
-      super._write(chunk, encoding, callback);
+      super._write(chunk, encoding as BufferEncoding, callback);
     }
     catch (e)
     {
@@ -71,7 +71,7 @@ export class SafeWritable extends Writable
     }
   }
 
-  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  public _writev(chunks: Array<{ chunk: any, encoding: BufferEncoding }>, callback: (err?: Error) => void): void
   {
     try
     {

@@ -88,7 +88,7 @@ export default class ProgressStream extends Duplex
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void)
   {
-    this.writer.write(chunk, encoding, (err?: Error) =>
+    this.writer.write(chunk, encoding as BufferEncoding, (err?: Error) =>
     {
       if (err === undefined)
       {
