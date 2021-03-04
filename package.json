@@ -316,7 +316,7 @@
     "@types/supertest": "^2.0.10",
     "@types/tape": "^4.13.0",
     "@types/xml2js": "^0.4.8",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "axios-mock-adapter": "^1.19.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
