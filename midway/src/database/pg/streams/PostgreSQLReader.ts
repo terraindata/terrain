@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as pg from 'pg';
-import * as PGQueryStream from 'pg-query-stream';
+import QueryStream = require('pg-query-stream');
 import { Readable } from 'stream';
 
 import SafeReadable from '../../../app/io/streams/SafeReadable';
@@ -55,7 +55,7 @@ export class PostgreSQLReader extends SafeReadable
 {
   private config: PostgreSQLConfig;
   private stream: Readable | null = null;
-  private query: PGQueryStream;
+  private query: any;
 
   constructor(config: PostgreSQLConfig, query: string, table?: string)
   {
@@ -81,7 +81,7 @@ export class PostgreSQLReader extends SafeReadable
         queryString = query;
       }
 
-      this.query = new PGQueryStream(queryString);
+      this.query = new QueryStream(queryString);
 
       const client: pg.Client = new pg.Client(config);
       client.connect((err) =>

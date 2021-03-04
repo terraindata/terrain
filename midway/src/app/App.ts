@@ -123,6 +123,7 @@ export class App
     };
     MidwayLogger.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
     const controller = await DatabaseControllerConfig.makeDatabaseController(dbConfig);
+    MidwayLogger.info('System database initialized');
     return controller.getTasty();
   }
 

@@ -150,7 +150,7 @@ class PostgreSQLClient
     });
   }
 
-  public query(queryString: string, handle?: TransactionHandle, params?: any[], callback?: any): pg.Query
+  public query(queryString: string, handle?: TransactionHandle, params?: any[], callback?: any): void
   {
     if (handle !== undefined)
     {
