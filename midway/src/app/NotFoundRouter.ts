@@ -49,7 +49,7 @@ import * as send from 'koa-send';
 
 const NotFoundRouter = new KoaRouter();
 
-NotFoundRouter.get('*', async (ctx, next) =>
+NotFoundRouter.get('(.*)', async (ctx, next) =>
 {
   await send(ctx, '/midway/src/assets/index.html');
 });
