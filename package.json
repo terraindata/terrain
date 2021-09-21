@@ -246,7 +246,7 @@
     "sha1": "^1.1.1",
     "shallow-compare": "^1.2.2",
     "sqlite3": "^4.0.9",
-    "ssh2": "^0.6.1",
+    "ssh2": "^1.4.0",
     "ssh2-sftp-client": "^2.2.1",
     "stream-consume": "^0.1.1",
     "strong-soap": "^1.9.0",
